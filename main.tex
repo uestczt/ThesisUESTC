@@ -1,244 +1,910 @@
 
 \documentclass[master]{thesis-uestc}
-
-\title{UESTC Thesis Template}
-\author{王稳}
+\usepackage{mathrsfs}
+\usepackage{braket}
+\usepackage{amssymb}
+\usepackage{indentfirst}
+\usepackage{ragged2e}
+\title{大气湍流中涡旋光束轨道角动量谱的扩散及修正的研究}
+\author{张滔}
 
 \begin{document}
 
 \begin{chineseabstract}
-为了适应日益增长的宽带信号和非线性系统的工程应用，用于分析瞬态电磁散射问题的时域积分方程方法研究日趋活跃。本文以时域积分方程时间步进算法及其快速算法为研究课题，重点研究了时间步进算法的数值实现技术、后时稳定性问题以及两层平面波算法加速计算等，主要研究内容分为四部分。
+自 Allen 在 1992 年指出涡旋光束具有轨道角动量（orbital angular
+momentum，OAM）后，人们对涡旋光束在各个领域的应用产生了极大的兴趣。由于涡旋光束所携带的 OAM 的量子数可为任意整数，因此理论上每一种涡旋光束可具有无穷多个 OAM 模。另外，涡旋光束的各个 OAM 模之间相互正交，因此同时利用这些不同的模式可进行高速率的数据传输。近年来，涡旋光束在大气通信中的应用得到了广泛的研究并展现出了巨大的应用潜力。然而，大量研究表明， OAM 在大气湍流的影响下会发生严重的扩散，并进而在通信中发生严重的模间串扰，这阻碍了基于 OAM 的大气光通信的发展。目前已经有一些改善通信质量的方法，如自适应光学等。总体来说，基于 OAM 的大气光通信仍处于探索阶段，在实际应用之前还需要做大量的工作。
 
-……
+本文主要做了以下几方面的工作：
 
-\chinesekeyword{时域电磁散射，时域积分方程，时间步进算法，后时不稳定性，时域平面波算法}
+1、研究了一种名叫环形光束 （circular beam，CiB）的涡旋光束在大气湍流中的传播特性。CiB 是近轴波动方程的一个广义解，在特殊条件下可退化为几种常见的涡旋光束。研究结果表明当 CiB 的参数为某些特殊值时，CiB 可具有汇聚特性并进而使得 OAM 模在大气湍流中呈现出自动的恢复效应，这意味着 OAM 扩散可发生逆转。这一发现可提高初始 OAM 态的检测概率，有利于改善通信质量。
+
+2、证实了二维叠加 OAM 态在大气湍流中可能表现出协同效应。当二维叠加 OAM 态的两个 OAM 量子数彼此相邻时，协同效应变得明显。协同效应意味着二维叠加 OAM 态的检测概率大于它的任一部分所表示的 OAM 本征态。另外通过分析发现协同效应主要来源于二维叠加 OAM 态的两个 OAM 量子数互相变化的概率。当这一概率减小时，协同效应变弱甚至消失。
+
+3、研究了纠缠 OAM 光子对在大气湍流中的特性。纠缠 OAM 光子对的制备来源于自发参量下转换（spontaneous parametric down-conversion，SPDC）的方法。在这一方法中，泵浦光源用 OAM 模叠加而成。仿真结果表明，当接受态的波函数与泵浦光源的复振幅函数相一致时，检测概率最大。另外，比较了纠缠与非纠缠的情形。结论表明对于低阶 OAM 模，在传播距离较远时纠缠光子对中信号光子的检测概率大于非纠缠单光子的检测概率。另外对于纠缠情形，二维叠加 OAM 态的检测概率略大于 OAM 本征态的检测概率，并且这一差值在较强的湍流中更为明显。
+\chinesekeyword{涡旋光束，轨道角动量，大气湍流，检测概率，通信}
 \end{chineseabstract}
 
 
 
 \begin{englishabstract}
-With the widespread engineering applications ranging from broadband signals and non-linear systems, time-domain integral equations (TDIE) methods for analyzing transient electromagnetic scattering problems are becoming widely used nowadays. TDIE-based marching-on-in-time (MOT) scheme and its fast algorithm are researched in this dissertation, including the numerical techniques of MOT scheme, late-time stability of MOT scheme, and two-level PWTD-enhanced MOT scheme. The contents are divided into four parts shown as follows.
+Since Allen in 1992 pointed out that vortex beams have the orbital angular momentum (OAM), there is a great deal of interest in the application of vortex beams in various fields. As the number of OAM carried by a vortex beam can be any integer, each vortex beam in theory can have an infinite number of OAM modes. In addition, the OAM modes of the vortex beams are orthogonal to each other, so they can be used for high-speed data transmission at the same time. In recent years, the application of vortex beam in atmospheric communication has been widely studied and showed great potential. However, a large number of studies have shown that OAM will seriously spread under the influence of atmospheric turbulence, and then serious inter modal interference will occur in communication, which hinders the development of OAM based atmospheric optical communication. At present, there are some methods to improve the quality of communication, such as adaptive optics. In general, the atmospheric optical communication based on OAM is still in the exploratory stage, and a lot of work needs to be done before the practical application.
 
-\englishkeyword{time-domain electromagnetic scattering, time-domain integral equation (TDIE), marching-on in-time (MOT) scheme, late-time instability, plane wave time-domain (PWTD) algorithm}
+The main work of this paper is as follows:
+
+1. The propagation characteristics of a vortex beam named circular beam (CiB) in atmospheric turbulence are studied. The CiB is a generalized solution of the paraxial wave equation, which can be reduced to several common vortex beams under special conditions. The results show that when the parameters of CiB are taken with some special values, CiB can have convergence characteristics and thus the OAM modes present automatic recovery effect in the atmospheric turbulence, which means that the OAM scattering can be reversed. This finding can increase the detection probability of the initial OAM state and further improve the communication quality.
+
+2. It is proved that the two-dimensional superposed OAM states may exhibit synergy effect in the atmospheric turbulence. The synergy effect becomes obvious when the two OAM quantum numbers of two dimensional superposed OAM states are adjacent to each other. The synergy effect means that the detection probability of the two-dimensional superposed OAM state is larger than that of the corresponding OAM eigenstates. In addition, it is found that the synergy effect is mainly due to the probability that the two OAM quantum numbers of the two dimensional superposed OAM states turn into each other. When such probabilities decrease, the synergy effect becomes weak or even disappear.
+
+3. In this paper, the properties of entangled OAM photon pairs in atmospheric turbulence are studied. The preparation of entangled OAM photon pairs is derived from the spontaneous parametric down conversion (spontaneous parametric down-conversion, SPDC) method. In this method, the pump is superposed by OAM modes, and the simulation results show that the detection probability is the largest when the wave function of the receiving state is consistent with the complex amplitude function of the pump. In addition, the entanglement case and non-entanglement case are compared. The results show that for the low order OAM modes, the detection probability of the entangled photons is higher than that of the non-entangled single photons. In addition, for the case of entanglement, the detection probability of the two-dimensional superposed OAM states is slightly larger than that of the OAM eigenstates, and the difference is more obvious in the stronger turbulence.
+\englishkeyword{vortex beam, orbital angular momentum, atmospheric turbulence, detection probability, communication}
 \end{englishabstract}
 
 \thesistableofcontents
 
 \thesischapterexordium
 
-\section{研究工作的背景与意义}
+\section{选题背景及意义}
+随着信息时代的到来，人们对信息传输速率的要求越来越高。无论是在有线通信还是在无线通信中，如何提高信息传输速率成为了当今的一个研究热点。利用光进行信息传输具有数据传输容量大、保密性强以及无电磁污染等优点，因此光通信在未来具有巨大的发展潜力。目前有几种不同的复用技术用到了光波的不同物理属性，例如利用光波偏振特性的偏振复用（Polarization Division Multiplexing，PDM） 技术、利用光波不同波长的波分复用（Wavelength Division Multiplexing，WDM）技术、利用不同时段的时分复用（Time Division Multiplexing，TDM）技术以及利用空间自由度的空分复用（Space Division Multiplexing，SDM）技术。另外，光波不同的相位和强度也可被用来进行信息传输。模分复用（Mode Division Multiplexing，MDM）技术是一种特殊的 SDM 技术，它用到了光波的相位和强度在空间中分布的不同模式。轨道角动量（Orbital Angular Momentum, OAM）是光的一个重要属性，它对应了光在空间中的分布。自 Allen 在 1992 年指出拉盖尔- 高斯（LG）光束具有 OAM 以来\citeup{Allen1992_Orbital}，人们一直对如何利用包括 LG 光束在内的涡旋光束进行通信有很大兴趣。由于涡旋光束的每一个 OAM 模式之间相互正交，因此在没有干扰的情况下，可以在接收端将不同的 OAM 模完全分开。理论上 OAM 可以提供无穷多个模式，这意味着基于 OAM 的数据传输可以远远快于目前的几种常用方式。
 
-计算电磁学方法\citing{wang1999sanwei, liuxf2006, zhu1973wulixue, chen2001hao, gu2012lao, feng997he}从时、频域角度划分可以分为频域方法与时域方法两大类。频域方法的研究开展较早，目前应用广泛的包括：矩量法（MOM）\citing{xiao2012yi,zhong1994zhong}及其快速算法多层快速多极子（MLFMA）\citing{clerc2010discrete}方法、有限元（FEM）\citing{wang1999sanwei,zhu1973wulixue}方法、自适应积分（AIM）\citing{gu2012lao}方法等，这些方法是目前计算电磁学商用软件
-\footnote{脚注序号“\ding{172}，……，\ding{180}”的字体是“正文”，不是“上标”，序号与脚注内容文字之间空1个半角字符，脚注的段落格式为：单倍行距，段前空0磅，段后空0磅，悬挂缩进1.5字符；中文用宋体，字号为小五号，英文和数字用Times New Roman字体，字号为9磅；中英文混排时，所有标点符号（例如逗号“，”、括号“（）”等）一律使用中文输入状态下的标点符号，但小数点采用英文状态下的样式“.”。}
-（例如：FEKO、Ansys 等）的核心算法。由文献\cite{feng997he,clerc2010discrete,xiao2012yi}可知
+近年来，OAM 在自由空间光通信（Free-Space Optical Columniation，FSO），特别是大气通信中的应用受到了广泛关注     \citeup{Huang2014_100,Willner2015_Optical,Gibson2004_Free,Anguita2008_Turbulence,Paterson2005_Atmospheric,Wang2011_High,Krenn2014_Communication,Wang2012_Terabit,Ren2013_Atmospheric}。 不少研究表明基于 OAM 的大气光通信是可行的，但是由于大气湍流的影响，通信中只能用到有限数量的 OAM 模。有大量研究表明，大气湍流会使得 OAM 扩散\citeup{Tyler2009_Influence,Rodenburg2012_Influence,Zhu2015_Effects,Zhu2014_Probability,Zhang2014_Influence,Cheng2014_Effects,Gopaul2007_The,Sheng2012_Effects}，这对通信造成了严重的串扰 \citeup{Ren2013_Atmospheric}。一般地，当通信距离越长时大气湍流对涡旋光束的影响越大，OAM 扩散越严重。可以说，串扰严重限制了基于 OAM 的大气光通信的距离。另外，大气中的悬浮微粒会引起光的散射和吸收，这使得光在传播中会产生漂移、扩散、闪烁和相位波前畸变等不利于信息传输的现象。近十几年来，有一些重要的工作对 OAM 的扩散规律进行了探索。例如，Paterson 第一个建立了光子的 OAM 在 Kolmogorov 湍流中的扩散模型\citeup{Paterson2005_Atmospheric}，以及最近张逸新等对几种类型的 OAM 模在 non-Kolmogorov 湍流中 OAM 扩散的研究 \citeup{Zhu2015_Effects,Zhu2014_Probability,Zhang2014_Influence,Cheng2014_Effects,Sheng2012_Effects}。 从这些工作的结果来看，高阶的 OAM 模更易发生 OAM 扩散，这严重限制了大气通信中对 OAM 高阶模的使用。
 
-\section{时域积分方程方法的国内外研究历史与现状}
-时域积分方程方法的研究始于上世纪60 年代，C.L.Bennet 等学者针对导体目
-标的瞬态电磁散射问题提出了求解时域积分方程的时间步进（marching-on in-time,
-MOT）算法。
+目前在基于 OAM 的大气光通信上已经有了较为充分的理论和实验上的准备。从 Kolmogorov 理论的提出到现在 non-Kolmogorov 大气湍流光学模型和各向异性大气湍流光学模型的建立，人们对光在大气湍流中传播特性的研究正趋于完善。另外，近几年来有不少关于基于 OAM 大气光通信的实验被实施。 减轻 OAM 扩散以及提高通信质量的方法也在不断的研究中 \citeup{Zhao2011_Aberration,Huang2014_Crosstalk,Li2014_Evaluation,Ren2015_Turbulence,Xie2015_Phase}。 总体来说，利用 OAM 进行大气通信还处于实验和探索阶段，距离广泛应用还需要一定的时间。不过正是由于新颖性和巨大的应用潜力，这一领域能够为人们提供广阔的研究空间。
 
-\section{本文的主要贡献与创新}
-本论文以时域积分方程时间步进算法的数值实现技术、后时稳定性问题以及两层平面波加速算法为重点研究内容，主要创新点与贡献如下：
+\section{国内外研究现状}
+目前国内外主要从以下几个方面围绕基于 OAM 的大气通信进行研究：一、对大气湍流光学模型的完善；二、发现新型的涡旋光束；三、研究大气湍流对各类涡旋光束或者携带 OAM 的光子的影响；四、研究基于 OAM 的大气光通信的可行性；五、通信质量的改善方法。
 
-\section{本论文的结构安排}
-本文的章节结构安排如下：
+自 Allen 在 1992 年指出了拉盖尔- 高斯（LG）光束具有 OAM \citeup{Allen1992_Orbital}以来，各种携带 OAM 的涡旋光束陆续被发现并得到了深入的研究。这些涡旋光束包括了汉克尔-贝塞尔光束（Hankel–Bessel beam, HBB）\citeup{Kotlyar2012_Hankel}、惠特克- 高斯光束 （Whittaker-Gaussian beam, WGB）\citeup{Lopez-Mago2015_Propagation}、超几何高斯光束 （Hypergeometric-Gaussian beam, HyGGB）\citeup{Karimi2007_Hypergeometric}等。特别是，环状光束（Circular beam，CiB）作为近轴波动方程的一个广义解也具有 OAM\citeup{Bandres2008_Bandres}。CiB 在一些特殊条件下可退化为常见的涡旋光束，而在其他的条件下仍能保持自身的特性\citeup{Vallone2015_On}。除了圆对称光束之外，椭圆对称光束如因斯-高斯光束（Ince-Gauss beam，IGB）的 OAM 也得到了深入的研究\citeup{Plick2013_Quantum}。 近年来，能够自动聚焦的超几何光束 （Auto-focusing accelerating hyper-geometric laser beams, AHB）也被发现具有 OAM\citeup{Kovalev2016_Auto}。另外，人们发现可通过自发参数下转换 （Spontaneous Parametric Down Conversion, SPDC）的方法制备出 OAM 纠缠的光子对，并通过理论计算得到信号光子处于各个 OAM 态的概率分布\citeup{Arnold2002_Two,Walborn2004_Entanglement,Miatto2011_Full,Torres2003_Quantum,Yao2011_Angular}。 对各类 OAM 模的深入挖掘有助于信息领域的发展，例如涡旋光束的自动聚焦特性和光子之间的 OAM 纠缠特性就有巨大的应用潜力。
+
+在对涡旋光束在大气湍流中的 OAM 扩散进行考察之前，对大气湍流的运动规律和光学特性进行研究是必要的。人们对大气湍流的研究已经有一段比较长的历史。从 50 年前到现在，大气湍流光学模型经历了从 Kolmogorov 湍流模型到 non-Kolmogorov 湍流模型，再到各向异性湍流模型的一个不断完善的过程。 Kolmogorov 湍流模型是最早以及应用最广泛的大气湍流光学模型之一。Fried 引进了波结构函数（Wave Structure Function，WSF）以定量描述随机介质对光波造成的波前畸变\citeup{Fried1966_Optical}。WSF 可以表示为相位结构函数和对数幅度结构函数之和。在 Kolmogorov 湍流中，湍流的扰动强度与 Fried 系数 $r_0$ 相关，当 $r_0$ 越小，扰动越强。另外，Fried 的结果表明，在近场区域，相位扰动起主要作用，而在远场区域，相位扰动和强度扰动的作用相当。Kerr 指出了 Kolmogorov 湍流模型并不能在任何情况下都适用\citeup{KERR1972_Experiments}。事实上，大气湍流的幂律指数 $\alpha$ 会随着高度的变化而变化，只有当 $\alpha=11/3$ 时，Kolmogorov 湍流模型才适用                                 \citeup{Zilberman2008_Propagation}。为了弥补 Kolmogorov 湍流模型的不足，non-Kolmogorov 湍流模型被建立起来。在 non-Kolmogorov 湍流模型中，相干长度 $\rho_0$ 被用来描述大气湍流对光波造成干扰的程度，当 $\alpha=11/3$ 时，$\rho_0$ 就退化为 $r_0$\citeup{Rao2000_Spatial,Striblingt1998_Optical}。 在 non-Kolmogorov 湍流中，能够反映湍流强度的折射率结构常数可以与 Kolmogorov 湍流的折射率结构常数建立关系，这为计算带来了方便\citeup{Baykal2011_Equivalence,Li2015_Equivalent}。 在 40 年前，Consortini 等证实了大气湍流具有各向异性的性质\citeup{Consortini1970_Investigation}。Kon 认为不同大小的涡旋湍流都具有相同的各向异性程度\citeup{Kon1994_Qualitative}，而 Toselli 则认为大气湍流的各向异性程度与涡旋湍流的几何尺寸、形状和空间方向都有关系\citeup{Toselli2014_Introducing}。总之，大气湍流光学模型处于不断的完善中，这为研究涡旋光束在大气湍流中的传播特性提供了理论基础。
+
+Paterson 在 2005 年最先从理论上研究了携带 OAM 的单光子在大气湍流中的 OAM 扩散                                \citeup{Paterson2005_Atmospheric}。 这一研究是基于一种半经典的方法来计算接收面上 OAM 态的检测概率。另外，研究中用到了 LG 模以及弱  Kolmogorov 湍流模型。研究结论表明，OAM 容易受到大气湍流的影响。Torner 表明任意的复振幅函数可以表示为螺旋谱叠加的形式，这为大气湍流中 OAM 态的概率计算带来了方便\citeup{Torner2005_Digital}。 在之后将近 10 年的时间中，有大量文献研究了不同的 OAM 模在大气湍流中的传播特性。张逸新等在近几年来研究了 HyGGB 以及 WGB 等几种 OAM 模在 non-Kolmogorov 湍流中的 OAM 扩散\citeup{Zhu2015_Effects,Zhang2014_Influence}。结论表明，模场的分布的不同会影响到 OAM 扩散程度，并且当 OAM 量子数增大时，OAM 扩散越严重。除了单光子情形之外，有文献研究了纠缠光子对在大气湍流中的 OAM 扩散。Gopaul 和 Andrews 从理论上建立了利用自发参数下转换 （spontaneous parametric down-conversion，SPDC）自备的纠缠光子对在弱 Kolmogorov 湍流中的 OAM 检测概率模型 \citeup{Gopaul2007_The}。结论表明，在大气湍流中纠缠光子对比单光子的鲁棒性弱，但在低阶 OAM 模下信号光子比单光子的鲁棒性强。这一结论指出了利用 OAM 纠缠光子对进行大气通信的优势。
+
+在经典通信领域，人们用了大量实验来证明基于 OAM 的自由空间光通信方案是切实可行的。Gibson 在 2004 年的论文中指出了可利用 OAM 进行自由空间光通信\citeup{Gibson2004_Free}，并提出了 OAM 复用技术。Wang 等利用 OAM 复用和偏振复用相结合的方式可将自由空间光通信的数据传输速率提高到 Tb 量级\citeup{Wang2012_Terabit}。Huang 等将 OAM 复用、偏振复用 （PDM） 和波分复用 （WDM） 结合起来后的通道数可达到 1008 个（其中用了 12 个 OAM 模式），通信速率能够被提高到 100 Tbit/s \citeup{Huang2014_100}。Krenn 等在维也纳高空的强湍流中利用二维 OAM 叠加模进行了 3 公里的通信实验，实验中用到了 8 组（16 个）不同的 OAM 模\citeup{Krenn2014_Communication}。实验表明，不同的 OAM 模能够被有效的分开，并且在调整 OAM 叠加模的相对相位角后可将平均误码率降为 $0.7\%$。另外，在量子领域，OAM 可被用作量子密钥分配（Quantum key distribution，QKD）。与利用光的极化相比，这一方案能增加QKD 的维度，进而增加信息容量及信息的安全性。Mirhosseini 等通过实验证明了这一方案的可行性 \citeup{Mirhosseini2015_High}。
+
+利用 OAM 进行自由空间通信难免会受到外界的干扰，例如在大气中会受到大气湍流的影响。大气湍流会引起涡旋光束的波前畸变，从而严重降低了通信质量。利用各种方法对波前进行修正是提高通信质量的重要途径。Zhao 等用了 Shack-Hartmann 波前修正方法和 OAM 态的相位修正方法来修复经过大气湍流后的涡旋光束的波前，并发现后者的修复效果要好于前者            \citeup{Zhao2011_Aberration}。Huang 等用了 $4\times4$ MIMO 均衡来减轻弱湍流对基于 OAM 的自由空间光通信造成的串扰。研究发现这一方法可以减小由串扰造成的误码率，但不能明显减少光信噪比带来的那部分误码率\citeup{Huang2014_Crosstalk}。 基于泽尼克多项式，Xie 等用了一种叫做 SPGD（stochastic-parallel-gradient-descent algorithm）的方法来修正涡旋光束的相位。实验表明这一方法可以使得串扰降低超过 5dB\citeup{Xie2015_Phase}。 Ren 等用了自适应光学的方法来补偿湍流对通信链路的干扰，实验中用到了 OAM 复用和偏振复用相结合的的方法。实验中研究了不同波长的信标光并发现对波长的选择会影响补偿的效果\citeup{Ren2015_Turbulence}。Li 等用了自适应光学来实时地补偿强湍流对涡旋光束造成的干扰 \citeup{Li2014_Evaluation}。另外，Djordjevic 等的研究表明，低密度奇偶校验（Low Density Parity Check，LDPC）码也可用来对畸变的涡旋光束进行有效地补偿\citeup{Djordjevic2012_Error,Djordjevic2010_LDPC}。
 
 
-\chapter{时域积分方程基础}
-时域积分方程（TDIE）方法作为分析瞬态电磁波动现象最主要的数值算法之一，常用于求解均匀散射体和表面散射体的瞬态电磁散射问题。
+\section{本文的主要研究内容及创新}
+本文主要通过数学建模及数值仿真的方式，研究几种特殊的 OAM 态在 non-Kolmogorov 湍流中的传播特性，并揭示几种减轻 OAM 扩散或者说修正 OAM 模的物理现象。论文的主要创新如下：
 
-\section{时域积分方程的类型}
+一、有大量关于大气湍流中涡旋光束传播特性的研究表明，OAM 扩散会随着传播距离的增加而变得严重，并且初始 OAM 模的检测概率在这一过程中逐渐减小。本文中以最新发现的环状光束为例，第一次揭示了涡旋光束的汇聚特性可能会在一定范围内逆转这一现象。
 
-\section{空间基函数与时间基函数}
-利用数值算法求解时域积分方程，首先需要选取适当的空间基函数与时间基
-函数对待求感应电流进行离散。
+二、有不少工作将研究重心放在了大气湍流对各类 OAM 本征模的影响的研究上，但对 OAM 叠加模在大气湍流中的特性的研究却较少。本文中研究了叠加态在大气湍流中的 OAM 扩散，并揭示了一种新现象：协同效应。这一效应的发现可能会促进基于多维 OAM 叠加态的大气通信系统的研究。
 
-\subsection{空间基函数}
-RWG 基函数是定义在三角形单元上的最具代表性的基函数。它的具体定义如
-下：
-\begin{equation}
-f_n(r)=
-\begin{cases}
-\frac{l_n}{2A_n^+}\rho_n^+=\frac{l_n}{2A_n^+}(r-r_+)&r\in T_n^+\\
-\frac{l_n}{2A_n^-}\rho_n^-=\frac{l_n}{2A_n^-}(r_--r)&r\in T_n^-\\
-0&\text{其它}
-\end{cases}
+三、Gopaul 和 Andrews 的研究表明，纠缠 OAM 光子对可能在弱大气湍流中比不纠缠的单光子更稳定。本文在这一工作的基础上进行扩展，研究了当泵浦光源由 LG 模叠加而成时接收态在二维希尔伯特空间中的投影。这一研究能够为 OAM 纠缠光子对在大气通信中的应用带来新思路。
+
+ \section{论文结构安排}
+
+本文共分为六章，各个章节的具体内容介绍如下：
+
+第一章主要介绍了利用携带 OAM 的涡旋光束进行大气通信的研究意义及现状，并概述了大气湍流对涡旋光束造成的 OAM 扩散及其在通信中的影响。最后阐明了本文的主要目的在于研究 OAM 扩散的规律并寻找减轻 OAM 扩散的方法。
+
+第二章介绍了几种主要的大气湍流光学模型：Kolmogorov 湍流模型、non-Kolmogorov 湍流模型以及各向异性的湍流模型的理论基础，并对三种模型的普适性作了说明。另外，本章对 Kolmogorov 湍流和 non-Kolmogorov 湍流中扰动强弱的概念及判定依据作了介绍。
+
+第三章研究了汇聚涡旋光束在 non-Kolmogorov 湍流中的 OAM 扩散，并以环状光束为例建立了 OAM 扩散模型。通过数值计算的方法，发现汇聚的环状光束在 non-Kolmogorov 湍流中有复原效应，这一效应使得 OAM 扩散在一定范围内能够随着传播距离的增加而减轻。最后分析了任何的涡旋光束只要具有足够的汇聚程度，它们都可能具有复原效应。另外，本章中推导出了无论在什么样弱湍流中，初始态变成相邻态的概率上限为 0.219。
+
+第四章研究了二维轨道角动量叠加态在 non-Kolmogorov 湍流中的 OAM 扩散。数值计算表明，两个 OAM 量子数相邻的叠加态在受到大气湍流引起的相位扰动后，可能表现出协同效应。这一效应能够增强 OAM 态抵抗湍流的能力。另外，理论分析表明，这一效应的出现与二维轨道角动量叠加态的两个 OAM 量子数的互变概率有关。
+
+第五章研究了纠缠光子对在 non-Kolmogorov 湍流中的 OAM 扩散。纠缠光子对由 SPDC 方法制备，并假设了泵浦光源由 LG 模叠加而成。另外，接收概率的检测是在二维希尔伯特空间中进行。数值计算表明，当接收概率在二维希尔伯特空间中的投影与泵浦光源的叠加方式一致时，初始态的接收概率最大。本章还比较了纠缠与非纠缠的情形，展示了 OAM 纠缠态在通信中的优势。
+
+第六章总结了第三章、第四章和第五章的研究结论，并说明了在本文的研究基础上需要进行的后续工作。
+
+
+% !Mode:: "TeX:UTF-8"
+
+\chapter{大气湍流光学模型介绍}
+\section{相关背景介绍}
+光束在大气中传播时常常会受到大气颗粒物和大气湍流的影响。大气颗粒物如尘埃、水滴等会引起光束的吸收和散射，大气湍流引起光束的漂移、闪烁、波前畸变等。这些现象都不利于在大气中进行高质量和高速率的信息传输。因此，为了减轻这些影响，考察光在大气中传播的特性是必要的。本文将考察大气湍流对光束带来的影响。在大气中，温度、压力等因素常常是随机变化的，这导致了不同位置处的折射率随着时间的增加而随机变化。大气折射率的随机变化对于在大气中传播的光束有不可忽视的影响，当这一变化越剧烈时，对光束的影响越严重。那么，如何衡量这一随机变化的剧烈程度就成为了大气光学领域的一个重要问题。由于大气折射率变化具有随机性，为了便于研究，人们往往更关心其统计特性。利用随机场相关函数可研究随机场中随机量在一点处的方差，以及在任意两点处的关联。根据 Kolmogorov 的理论，大气湍流折射率场是局部均匀和各向同性的。在局部均匀和各向同性的折射率随机场中，相关函数只与两点间的距离有关，其定义如下：
+\begin{equation}\label{cov_fun}
+B_{n}(\textbf{R})=\langle[n(\textbf{R}_1)-\langle n(\textbf{R}_1)\rangle][n(\textbf{R}_1+\textbf{R})-\langle n(\textbf{R}_1+\textbf{R})\rangle]\rangle
+\end{equation}
+其中 $\textbf{R}$ 和 $\textbf{R}_1$ 均表示空间位置矢量。$\langle\cdot\rangle$ 表示总体平均。$n(\cdot)$ 表示折射率。当 $\textbf{R}$ 为 0 时，则折射率相关函数表示方差即 $B_{n}(\textbf{0})=\sigma_{n}^2$。从公式 \eqref{cov_fun} 中可以看出，相关函数与场中每一点的均值无关。现在人们普遍采用折射率结构函数来刻画大气湍流中折射率场的特性。折射率结构函数的定义如下
+\begin{equation}\label{n_struction}
+D_{n}(\textbf{R})=\langle[n(\textbf{R}_1)+\langle n(\textbf{R}_1)\rangle-n(\textbf{R}_1+\textbf{R})-\langle n(\textbf{R}_1+\textbf{R})\rangle]^2\rangle
+\end{equation}
+由于大气湍流的折射率在局部范围内的均值几乎一样，所以公式 \eqref{n_struction} 还可以写为
+\begin{equation}\label{n_struction}
+D_{n}(\textbf{R})=\langle[n(\textbf{R}_1)-n(\textbf{R}_1+\textbf{R})]^2\rangle
+\end{equation}
+折射率结构函数和折射率相关函数之间的关系如下
+\begin{equation}\label{Kolmogorov_s_s}
+D_{n}(r)=2[B_{n}(0)-B_{n}(r)]
+\end{equation}
+其中 $r=|\textbf{R}|$ 为了从理论上反映大气折射率的变化规律，研究者们以随机场理论作为基础，发展出了几种有效的大气湍流光学模型：Kolmogorov 湍流模型，non-Kolmogorov湍流模型和各向异性湍流模型。Kolmogorov 湍流模型是根据 Kolmogorov 的理论假设建立起来，能够预测光束在大气湍流局部区域里的传播特性。non-Kolmogorov 模型的建立并不完全依赖于 Kolmogorov 的理论，它在 Kolmogorov 模型的基础上进行拓展，引入了一个自由系数 $\alpha$。 Kolmogorov 模型和non-Kolmogorov 模型都假设大气湍流是局部均匀和各向同性的。各向异性湍流模型又是对 non-Kolmogorov 模型的拓展，并引入了一个自由系数叫做各向异性因子。这三种模型将会在 2.2，2.3，2.4 节中分别介绍。
+
+\section{Kolmogorov 湍流模型}
+Kolmogorov 湍流模型是由 Kolmogorov 关于大气湍流运动的三个假设导出，是最早、应用最广泛和最简单的大气湍流光学模型。根据 Kolmogorov 理论，Kolmogorov 湍流模型假设湍流是局部均匀和各向同性的，并且可导出其折射率结构函数为
+\begin{equation}\label{Kolmogorov_s}
+D_{n}(r)=\mathrm{C}^2_{n}r^{2/3}
+\end{equation}
+从公式 \eqref{Kolmogorov_s} 中可以看出，系数 $\mathrm{C}^2_{n}$ 越大，在 $r$ 增加时 $D_{n}(r)$ 就上升得越快，湍流的运动也就越剧烈。这里 $\mathrm{C}^2_{n}$ 被称作折射率结构常数，是反映湍流强度的一个指标。根据折射率结构函数，可导出 Kolmogorov 湍流中折射率场的空间谱。由于湍流涡旋具有尺度效应，根据适用范围可将其空间谱分为 Kolmogorov 谱、Tatarskii 谱、exponential 谱、von Karman 谱和 modified 谱。Kolmogorov 谱是形式较为简单的一种谱，其具体表示如下
+\begin{equation}\label{Kolmogorov_s2}
+\Phi_{n}(\kappa)=0.033C_n^{2}\kappa^{-11/3}\quad(L_{0}^{-1}<<\kappa<<l_{0}^{-1})
+\end{equation}
+其中 $l_{0}$ 是湍流涡旋的内尺度，$L_{0}$ 是湍流涡旋的外尺度，$\kappa$　是空间波数，$C_n^{2}$ 是 Kolmogorov 湍流的折射率结构常数。从公式 \eqref{Kolmogorov_s2} 中可知，Kolmogorov 谱只在 $\kappa$ 远大于湍流涡旋内尺度且远小于湍流涡旋外尺度时有效。Tatarskii 谱可将适用范围拓展到 $\kappa$ 接近 $l_{0}^{-1}$ 的情形, 而 exponential 谱可将其适用范围拓展到 $\kappa$ 接近 $L_{0}^{-1}$ 的情形。von Karman 谱和 modified 谱都适用于两种情形，不过 modified 谱的预测效果要好于 von Karman 谱。
+
+当大气湍流的运动很剧烈时，光束可能会受到严重的影响。但是，如果光束的传播距离很短，其受到的影响也会较小。事实上，除了湍流强度之外，还有一些因素会影响到光束受到干扰的程度。Fried 引入一个概念叫做相干长度（或 Fried 数），可描述光束在 Kolmogorov 湍流中传播时受到干扰的程度，其表示如下
+\begin{equation}\label{Fried_index}
+r_0=\left(0.423k^2\mathrm{C}^2_{n}z\right)^{5/3}
+\end{equation}
+当 Fried 数 $r_0$ 越小时，光束受到干扰的程度越大。从公式 \eqref{Fried_index} 中可知，光束的波数 $k$、 大气折射率结构常数 $\mathrm{C}^2_{n}$ 的大小以及传播距离 $z$ 的长短都会影响到 $r_0$ 的值。
+
+\section{non-Kolmogorov湍流模型}
+在一些条件下，Kolmogorov 湍流模型并不能很好地预测光束在大气湍流中的传播特性。因此，在 Kolmogorov 湍流模型的基础上，人们建立了一个适用范围更为广泛的模型： non-Kolmogorov 湍流模型。在 non-Kolmogorov 湍流模型中，$\alpha$ 是一个未定参数，它可以根据具体的情况确定，以便更好的与实验数据相一致。当 $\alpha$=11/3 时，non-Kolmogorov 湍流退化成 Kolmogorov 湍流，因此 Kolmogorov 湍流是 non-Kolmogorov 湍流的一种特殊情况。与 Kolmogorov 湍流一样，non-Kolmogorov 湍流也是各向同性的。这一小节主要根据 Stribling 等的文献 \citeup{} 来介绍 non-Kolmogorov 的理论模型。non-Kolmogorov 湍流中折射率的结构函数可以表示为
+\begin{equation}\label{non_structure_function}
+D_{n}(\alpha,r,z)=C(z)r^{\alpha-3}
+\end{equation}
+\noindent 其中，$C(z)$ 是在 $z$ 处的折射率结构常数，单位为 $\mathrm{m}^{3-\alpha}$。当 $\alpha=11/3$ 时，$C(z)$ 退化成 $C_{n}^2$。根据折射率结构函数与折射率功率谱的关系
+\begin{equation}\label{non_power spectrum}
+\Phi_{n}(\kappa)=\frac{1}{4\pi^{2}\kappa^2}\int^{\infty}_0\frac{sin(\kappa{r})}{\kappa{r}}\frac{d}{dr}\left[r^2\frac{d}{dr}D_{n}(r)\right]dr
+\end{equation}
+\noindent 可得出折射率功率谱的表达式为
+\begin{equation}\label{non_power spectrum}
+\Phi_{n}(\kappa,z)=2^{\alpha-6}C(z)(\alpha^2-5\alpha+6)\pi^{-3/2}\frac{\Gamma\left[\frac{\alpha-2}{2}\right]}{\Gamma\left[\frac{5-\alpha}{2}\right]}\kappa^{-\alpha}
+\end{equation}
+\noindent 其中有 $3<\alpha<5$。为了方便，假设在光束的传播路径上折射率结构常数恒等，即：$C(z)=\beta$。 在 $3<\alpha<4$ 时，利用折射率功率谱 $\Phi_{n}(\kappa,z)$ 与波结构函数的关系，可计算出波结构函数
+\begin{equation}\label{non_wave_function}
+ D_{\omega}(\rho)=-2^{4-\alpha}\pi^{2}k^{2}a(\alpha)\beta{z}\frac{\Gamma\left[\frac{2-\alpha}{2}\right]}{(\alpha-1)\Gamma\left[\frac{\alpha}{2}\right]}\rho^{\alpha-2}
+\end{equation}
+\noindent 这里 $a(\alpha)$ 是一个只与 $\alpha$ 有关的系数
+\begin{equation}\label{non_wave_function2}
+a(\alpha)=2^{\alpha-6}(\alpha^2-5\alpha+6)\pi^{-3/2}\frac{\Gamma\left[\frac{\alpha-2}{2}\right]}{\Gamma\left[\frac{5-\alpha}{2}\right]}
+\end{equation}
+波结构函数还可以表示为
+\begin{equation}\label{non_wave_function2}
+ D_{\omega}(\rho)=c\left(\frac{\rho}{\rho_0}\right)^{\alpha-2}
+\end{equation}
+\noindent 其中
+\begin{equation}\label{non_wave_function}
+ c=2\left(\frac{8}{\alpha-2}\Gamma\left[\frac{2}{\alpha-2}\right]\right)^{\frac{\alpha-2}{2}}
+\end{equation}
+\noindent 通过计算可知 $\rho_0$ 为
+\begin{equation}\label{coherence_radius}
+  \rho_0=\left[\frac{8}{\alpha-2}\Gamma\left(\frac{2}{\alpha-2}\right)\right]^\frac12
+  \cdot\left[\frac{2(\alpha-1)\Gamma\left(\frac{3-\alpha}{2}\right)}{\sqrt{\pi}\Gamma\left(\frac{2-\alpha}{2}\right)k^2\beta{z}}\right]^\frac{1}{\alpha-2}
+  \hspace{0.5cm}(3<\alpha<4)
 \end{equation}
 
-其中，$l_n$为三角形单元$T_n^+$和$T_n^-$公共边的长度，$A_n^+$和$A_n^-$分别为三角形单元$T_n^+$和$T_n^-$的面积（如图\ref{pica}所示）。
+\noindent 当 $\alpha$=11/3 时，$\rho_0$ 退化为 $r_0$。$\rho_0$ 的物理意义在于能够描述 non-Kolmogorov 湍流对光束的扰动程度，并且 $\rho_0$ 越大意味着扰动程度越大。从公式 \eqref{coherence_radius} 中可知，当传播距离 $z$ 增加时 $\rho_0$ 减小，这说明湍流对传播光束的影响具有积累效应。与传播距 \linebreak[4]
 
-\begin{figure}[h]
-\includegraphics{pica.pdf}
-\caption{RWG 基函数几何参数示意图}
-\label{pica}
-\end{figure}
-由于时域混合场积分方程是时域电场积分方程与时域磁场积分方程的线性组合，因此时域混合场积分方程时间步进算法的阻抗矩阵特征与时域电场积分方程时间步进算法的阻抗矩阵特征相同。
-\begin{equation}
-\label{latent_binary_variable}
-\mathbf{r}_{i,j}=
-\begin{cases}
-1,f(\mathbf{x}^{i};\mathbf{w})\cdot f(\mathbf{x}^{j};\mathbf{w})\geq u(\lambda),\\
-0,f(\mathbf{x}^{i};\mathbf{w})\cdot f(\mathbf{x}^{j};\mathbf{w})< l(\lambda), 1\leq i,j\leq n.\\
-f(\mathbf{x}^{i};\mathbf{w})\cdot f(\mathbf{x}^{j};\mathbf{w}),\text{otherwise},
-\end{cases}
+\begin{pics}[H]{ $\rho_0$ 随 $\alpha$ 的变化。}{Fig2_5.eps}
+\addsubpic{$z$=1000m}{width=0.48\textwidth}{Fig2_5a.eps}
+\addsubpic{$z$=2000m}{width=0.48\textwidth}{Fig2_5b.eps}
+\addsubpic{$z$=3000m}{width=0.48\textwidth}{Fig2_5c.eps}
+\addsubpic{$z$=4000m。在 (a)-(d) 中，波长均为 1550nm。}{width=0.48\textwidth}{Fig2_5d.eps}
+\end{pics}
+
+\begin{pics}[H]{ $\rho_0$ 随  $\alpha$ 的变化。}{Fig2_6.eps}
+\addsubpic{$\lambda$=532nm}{width=0.48\textwidth}{Fig2_6a.eps}
+\addsubpic{$\lambda$=632.8nm}{width=0.48\textwidth}{Fig2_6b.eps}
+\addsubpic{$\lambda$=850nm}{width=0.48\textwidth}{Fig2_6c.eps}
+\addsubpic{$\lambda$=1550nm。在 (a)-(d) 中，传播距离均为 3000m。}{width=0.48\textwidth}{Fig2_6d.eps}
+\end{pics}
+
+\noindent 离类似，当 $\beta$ 增加时 $\rho_0$ 减小。另外，当光束的波数 $k$ 增加时 $\rho_0$ 减少。由于 $\rho_0$ 与 $\alpha$ 的关系不能直观地通过公式 \eqref{coherence_radius} 来反映 ，因此下面需要通过图示来说明这一关系。
+
+图 \ref{Fig2_5.eps} 展现了在折射率结构常数 $\beta$ 不同相干长度 $\rho_0$ 随 non-Kolmogorov 湍流系数 $\alpha$ 的变化。从图 \ref{Fig2_5.eps} (a)-(d) 中可以看出，当 $\alpha$ 为  3 到  4 之间的任意值时，$\rho_0$ 随 $\beta$ 的增加而减少。这说明当湍流强度增加时扰动强度也随之增加。另外可以看到：(1) $\alpha$ 在 3.15-3.94 的范围内变化时，$\rho_0$ 的变化较小；(2) $\alpha$ 在 3-3.15 的范围内增加时, $\rho_0$ 急剧减少；(3) $\alpha$ 在 3.95-4 的范围内增加时, $\rho_0$ 再次急剧减少。对比图 \ref{Fig2_5.eps} (a)-(d) 可以看出，$z$ 从 1000m 增加到 4000m 时，$\rho_0$ 有轻微的减小。总之，图 \ref{Fig2_5.eps} 说明了 $\alpha$ 对 $\rho_0$ 的影响是突变的，这区别于 $\beta$，$z$ 和 $k$ 对 $\rho_0$ 的影响。图 \ref{Fig2_6.eps} 展现了在波长 $\lambda$ 不同时，相干长度 $\rho_0$ 与 non-Kolmogorov 湍流系数 $\alpha$ 之间的关系。图 \ref{Fig2_6.eps} 与图 \ref{Fig2_5.eps} 所表现的情况类似，但需要注意的是在图 \ref{Fig2_6.eps}(a) 和 \ref{Fig2_6.eps}(b) 中，当 $\beta=10^{-14}$ 时，$\rho_0$ 的最小值在 $\alpha$=3.2 附近得到，说明 $\rho_0$ 与 $\alpha$ 之间的关系并不是单调的。
+
+\section{各向异性湍流模型}
+最近几年关于光束在各向异性湍流中传播特性的研究越来越多。Toselli 认为当湍流涡旋的尺寸很小并接近湍流涡旋的内尺度（形成湍流涡旋的最小尺度，约为 1mm）时，湍流涡旋几乎是各向同性的，这时 non-Kolmogorov 湍流模型是适用的。当湍流涡旋很大并接近外尺度（形成湍流涡旋的最大尺度，大约几百到 1千米）时，湍流涡旋是不对称的，这时 non-Kolmogorov 湍流模型就不适用了。关于不对称湍流涡旋的形状如图 \ref{Fig2_7.eps} 所示。
+
+\pic[H]{不对称湍流涡旋示意图。}{width=0.4\textwidth}{Fig2_7.eps}
+
+湍流涡旋的不对称使得折射率结构函数会随着方向的变化而不同，因此 Toselli 引入了各向异性因子来描述各向异性湍流中的折射率结构函数。Andrews 等利用各向异性因子得到了普遍意义下的折射率结构函数
+\begin{equation}\label{anti_struction}
+D_n(x,y,z)=a\beta\left(\frac{x^2}{\mu^2_x}+\frac{y^2}{\mu^2_y}+z^2\right)^{(\alpha-3)/2}\quad(l_{0}<<R<<L_0)
+\end{equation}
+\noindent 其中 $l_{0}$ 为湍流涡旋的内尺度，$L_{0}$ 为湍流涡旋的外尺度。$\mu_x$ 和 $\mu_y$ 表示各向异性因子。$a$ 为一常数。从公式 \eqref{anti_struction} 中可以看出，$\mu^2_x$ 和 $\mu^2_y$ 越大时表示水平方向与垂直方向的不对称度越大。$\mu^2_x$ 和 $\mu^2_y$ 之间的差值越大时表示 $x$ 和 $y$ 之间的不对称度越大。当 $\mu^2_x=\mu^2_y=1$ 时，湍流涡旋是各向同性的。这里折射率功率谱可以表示为
+\begin{equation}\label{anti_power spectrum}
+\Phi_{n}(\kappa_x,\kappa_y,\kappa_z)=\frac{A(\alpha)\bar{C^2_{n}}\mu^2_{x}\mu^2_y}{\left(\mu^2_x\kappa_x^2+\mu^2_y\kappa_y^2+\kappa_z^2\right)^{\alpha/2}}
+\end{equation}
+\noindent 这里 $\bar{C^2_{n}}=a\beta$ 是广义折射率结构常数，单位为 $\mathrm{m}^{3-\alpha}$。 其中
+\begin{equation}\label{A}
+A(\alpha)=\frac{1}{4\pi^2}\Gamma(\alpha-1)\mathrm{cos}(\alpha\pi/2)\quad(3<\alpha<4)
+\end{equation}
+\noindent 与 Kolmogorov 湍流和 non-Kolmogorov 湍流一样，在各向异性湍流中一个颇为重要的参数是相干长度。利用相干长度可考查各向异性湍流对传播光束的干扰程度。在 $\mu_x=\mu_y=\mu$ 时球面波在各向异性湍流中传播时的相干长度为
+\begin{equation}\label{anti_coherence_radius}
+  \bar{\rho_0}=\left[\frac{\alpha\Gamma(\alpha-1)\Gamma(-\alpha/2)}{2^{\alpha}(\alpha-1)\Gamma(\alpha/2)}\mu\bar{C^2_{n}}k^{2}z\mathrm{cos}(\alpha\pi/2)\right]^{1/(2-\alpha)}\quad(3<\alpha<4)
 \end{equation}
 
-时域积分方程时间步进算法的阻抗元素直接影响算法的后时稳定性，因此阻抗元素的计算是算法的关键之一，采用精度高效的方法计算时域阻抗元素是时域积分方程时间步进算法研究的重点之一。
-
-
-\subsection{时间基函数}
-
-\subsubsection{时域方法特有的展开函数}
-
-\subsubsection{频域方法特有的展开函数}
-
-\section{入射波}
-
-如图\ref{picb}和图\ref{picc}所示分别给出了参数$E_0=\hat{x}$，$a_n=-\hat{z}$，$f_0=250MHz$，$f_w=50MHz$，$t_w=4.2\sigma$时，调制高斯脉冲的时域与频域归一化波形图。
-
-\begin{figure}[h]
-\subfigure[]{
-\label{picb}
-\includegraphics[width=7.3cm]{picb.pdf}}
-\subfigure[]{
-\label{picc}
-\includegraphics[width=6.41cm]{picc.pdf}}
-\caption{调制高斯脉冲时域与频率波形，时域阻抗元素的存储技术也是时间步进算法并行化的关键技术之一，采用合适的阻抗元素存储方式可以很大的提高并行时间步进算法的计算效率。}
-\label{fig1}
-\end{figure}
-时域阻抗元素的存储技术\citing{xiao2012yi}也是时间步进算法并行化的关键技术之一，采用合适的阻抗元素存储方式可以很大的提高并行时间步进算法的计算效率。
+\section{弱扰动的判断依据}
+在本文中主要用到的是光束在弱扰动区域中传播的理论模型，而这样的模型在强扰动区域中是不成立的。因此，首先应明确湍流扰动在什么时候是强扰动，什么时候是弱扰动。通常情况下，人们将对数幅度方差作为扰动强弱的判定依据。首先，光束所受的总扰动可以写为
+\begin{equation}\label{wave_variance}
+\sigma_\omega^2=\sigma_\chi^2+\sigma_\phi^2
+\end{equation}
+\noindent 其中 $\sigma_\chi^2$ 表示对数幅度方差，$\sigma_\phi^2$ 表示相位方差。公式 \eqref{wave_variance} 说明了光束在大气湍流中所受到的扰动可表示为幅度扰动和相位扰动的和。在 non-Kolmogorov 湍流中对数幅度方差可表示为
+\begin{equation}\label{wave_variance1}
+\sigma_\chi^2=-2^{(2-\alpha)/2}\pi^{5/2}k^{(6-\alpha)/2}\beta\frac{a(\alpha)}{\alpha}\frac{\Gamma\left[\frac{2-\alpha}{4}\right]}{\Gamma\left[\frac{\alpha}{4}\right]}z^{\alpha/2}
+\end{equation}
+当 $\alpha$=11/3 时，根据对数光强方差与对数幅度方差的关系式 $\sigma_I^2=4\sigma_\chi^2$ 可得到 Rytov 方差
+\begin{equation}\label{Rytov_variance}
+\sigma^2_{R}=1.23\mathrm{C}^2_{n}k^{7/6}z^{11/6},
+\end{equation}
+Rytov 方差是 Kolmogorov 湍流中衡量扰动强弱的一个系数。从公式 \eqref{Rytov_variance} 中可以看到，Rytov 方差不仅与湍流强度有关，还与传播距离和光束波长有关。当 $\sigma^2_{R}<<1$ 时，扰动为弱扰动；当 $\sigma^2_{R}>>1$ 时，扰动为强扰动。在 non-Kolmogorov 湍流中，Stribling 等提到了一个判断扰动强弱的依据\citeup{}: 在对数幅度方差 $\sigma_\chi^2$ 小于 0.3-0.5 时，可考虑为弱扰动区域。
 
 \section{本章小结}
-本章首先从时域麦克斯韦方程组出发推导得到了时域电场、磁场以及混合场积分方程。
+本章主要介绍了三种常用的大气湍流光学模型：Kolmogorov 湍流模型，non-Kolmogorov 湍流模型和各向异性湍流模型。通过他们的理论基础可以知道，non-Kolmogorov 湍流模型是 Kolmogorov 湍流模型的拓展，而各向异性湍流模型是 non-Kolmogorov 湍流模型的拓展。另外，本章介绍了大气湍流扰动强弱的判断依据。在弱扰动区域中，相位扰动为主要因素；在强扰动区域中，相位扰动和幅度扰动都为主要因素。最后，本章介绍了扰动强弱的判定依据。
 
-\chapter{时域积分方程数值方法研究}
-\section{时域积分方程时间步进算法的阻抗元素精确计算}
-时域积分方程时间步进算法的阻抗元素直接影响算法的后时稳定性，因此阻抗元素的计算是算法的关键之一，采用精度高效的方法计算时域阻抗元素是时域积分方程时间步进算法研究的重点之一。
+% !Mode:: "TeX:UTF-8"
 
-\section{时域积分方程时间步进算法阻抗矩阵的存储}
-时域阻抗元素的存储技术也是时间步进算法并行化的关键技术之一，采用合适的阻抗元素存储方式可以很大的提高并行时间步进算法的计算效率。
+\chapter{汇聚涡旋光束在non-Kolmogorov湍流中的轨道角动量扩散}
+\section{涡旋光束概述}
+光子不仅可以携带自旋角动量(spin angular momentum，SAM)，而且可以携带 OAM。 自旋角动量对应于光束的极化，它意味着光子能够拥有一个二维的量子态。OAM 对应于光束的空间分布，理论上它意味着光子能够拥有一个任意维度的量子态。自从 Allen 在 1992 年指出涡旋光束具有 OAM 之后，涡旋光束的传播特性及其应用一直是研究热点之一。涡旋光束的波前通常拥有一些不同于一般光束的特征：螺旋相位波前、暗核以及相位奇点等。一般地，涡旋光束复振幅在柱坐标下的表达式为:$\Psi(r,\varphi,z)=R(r,z)\exp{(\mathrm{i}l\varphi)/\sqrt{2\pi}}$，其中 $l\in Z$ 称为 OAM 量子数，它表明了每光子拥有的 OAM 为 $l\hbar$。LG 光束是一种研究较为深入的涡旋光束，其归一化复振幅的表达式为
+\begin{equation}\label{LG}
+  \begin{array}{rl}
+u(r,\varphi,z)=& \displaystyle \sqrt{\frac{2p!}{\pi(p+|l|)!}}\frac{1}{\omega(z)}\left[\frac{\sqrt{2}r}{\omega(z)}\right]^{|l|}L_{p}^{l}\left[\frac{2r^2}{\omega^2(z)}\right]\displaystyle\mathrm{exp}\left[-\frac{r^2}{\omega^2(z)}-\frac{\mathrm{i}kr^{2}z}{2(z^2+z_r^{2})}\right]\\
+& \displaystyle\mathrm{exp}\left[\mathrm{i}(2p+|l|+1)\mathrm{tan}^{-1}\frac{z}{z_r}\right]\mathrm{exp}\left[-\mathrm{i}l\varphi\right]
+  \end{array}
+\end{equation}
+\noindent 这里 $z_r=\pi\omega_{0}^2/\lambda$ 是 Rayleigh 长度, $k=2\pi/\lambda$ 是波数, $\omega(z)=\omega_{0}\sqrt{1+(z/z_r)^{2}}$ 光束半径, $\omega_{0}$ 是束腰半径, $\lambda$ 是波长, $p$ 是径向系数，$L_{p}^{l}(\cdot)$ 是广义拉盖尔多项式。图 \ref{Fig3_1.eps} 展示了 LG 光束在不同传播距离上的强度分布及相位分布。
 
-\subsection{时域积分方程时间步进算法产生的阻抗矩阵的特征}
-由于时域混合场积分方程是时域电场积分方程与时域磁场积分方程的线性组合，因此时域混合场积分方程时间步进算法的阻抗矩阵特征与时域电场积分方程时间步进算法的阻抗矩阵特征相同。
+近年来，不同种类的涡旋光束被陆续发现，并且它们的强度在空间中的分布是不同的，例如：拉盖尔- 高斯(Laguerre-Gaussian, LG) 光束、贝塞尔- 高斯(Bessel beam, BG) 光束、超几何(hypergeometric, HyG) 光束、超几何高斯(hypergeometric-Gaussian, HyGG) 光束等都具有圆柱对称特性\citeup{}，而最近发现的一些涡旋光束，例如涡旋埃尔米特- 高斯(vortex Hermite–Gaussian, vHG)光束等具有椭圆结构 \citeup{}。
 
-\subsection{数值算例与分析}
+另外一些研究表明了具有非衍射特性及部分相干特性的涡旋光束能较好的抵抗湍流效应。拥有非衍射特性的涡旋光束包括HyGG 光束\citeup{}、汉克尔-贝塞尔(Hankel-Bessel，HB)光束\citeup{}、 惠特克-高斯(Whittaker-Gaussian, WG)光束\citeup{} 和BG 光束\citeup{}等。部分相干涡旋光束里拥有所谓的“空间相干涡旋”，空间相干度会影响到涡旋光束本身的特性和传播性质\citeup{}。除了标量涡旋光束之外，矢量涡旋光束的传播特性也得到了一些研究\citeup{}。
 
-如图3-1(a)所示给出了时间步长选取为0.5ns时采用三种不同存储方式计算的平板中心处 方向的感应电流值与IDFT方法计算结果的比较。如图3-1(b)所示给出了存储方式为基权函数压缩存储方式，时间步长分别取时平板中心处 方向的感应电流计算结果，从图中可以看出不同时间步长的计算结果基本相同。
+\pic[H]{ LG 光束在 $z$=0 处的强度分布（上排）及相位分布（下排）。第一列中 $l$=1；第二列中 $l$=3；第三列中 $l$=5。 这里束腰半径为 $\omega_0$=3cm，径向参数为 $p$=0，波长为$\lambda$=1550nm。}{width=1\textwidth}{Fig3_1.eps}
 
-\begin{algorithm}[H]
- \KwData{this text}
- \KwResult{how to write algorithm with \LaTeX2e }
- initialization\;
- \While{not at end of this document}{
-  read current\;
-  \eIf{understand}{
-   go to next section\;
-   current section becomes this one\;
-   }{
-   go back to the beginning of current section\;
-  }
- }
- \caption{How to wirte an algorithm.}
-\end{algorithm}
+近年来，涡旋光束在大气通信中的传播特性受到越来越多的关注\citeup{}。它能够提供一组任意数目的 OAM 模同时进行信息传输。在没有干扰的自由空间中利用 OAM 进行通信不会产生串扰，因为理论上不同的 OAM 模之间互相正交：
+\begin{equation}\label{orthogonal}
+  \int_0^{2\pi}\Psi_{1}(r,\varphi,z)[\Psi_{2}(r,\varphi,z)]^\ast d\varphi=\left\{
+\begin{array}{rl}
+ & 0 \qquad\qquad\qquad\qquad\quad(l_1\neq{l_2})\\
+ & R_{1}(r,z)[R_{2}(r,z)]^\ast\qquad (l_1=l_2)
+  \end{array}\right
+\end{equation}
+\noindent 其中：
+\begin{equation}\label{orthogonal1}
+  \begin{array}{rl}
+    &\Psi_{1}(r,\varphi,z)=R_{1}(r,z)\exp{(\mathrm{i}l_{1}\varphi)/\sqrt{2\pi}}\\
+    &\Psi_{2}(r,\varphi,z)=R_{2}(r,z)\exp{(\mathrm{i}l_{2}\varphi)/\sqrt{2\pi}}
+  \end{array}
+\end{equation}
+\noindent 与 PDM 相比，基于OAM 的 MDM 提供了可观的复用信道数目，进而极大提高了信道容量。但在大气中，波前畸变导致了初始 OAM 模上的能量向其他的 OAM 模上扩散，如图 \ref{Fig3_2.eps} 所示。由于涡旋光束的 OAM 容易受到大气湍流的影响，OAM 在大气通信中的应用受到了严重阻碍。在先前的工作中，有几类涡旋光束的 OAM 扩散特性得到了深入的研究\citeup{}。理论和实验上的研究结果表明传播距离越长，湍流强度越强，它们的 OAM 扩散就越严重。
 
-由于时域混合场积分方程是时域电场积分方程与时域磁场积分方程的线性组合，因此时域混合场积分方程时间步进算法的阻抗矩阵特征与时域电场积分方程时间步进算法的阻抗矩阵特征相同。
+\pic[H]{涡旋光束经过大气湍流的示意图。在初始 OAM 模（$l$=$l_0$）上的能量经过大气湍流后扩散到其他 OAM 模上，在OAM 量子数为 $l$ 的模式上的能量归一化后可被认为是单光子为 $\ket{l}$ 态的概率。}{width=1\textwidth}{Fig3_2.eps}
 
-\section{时域积分方程时间步进算法矩阵方程的求解}
+OAM 扩散的现象并不是不可逆转的。Paterson 早在 2005 年就已经指出，在扰动强度一定的情况下（ Fried 系数 $r_0$ 不变）, OAM 的扩散会随着光束束宽减小而减轻。基于这一结论可以推断, 如果存在一类光束的束宽在一定传播范围内以足够的速率减少，那么 OAM 扩散在这一范围内会随着传播距离变长而变轻微。这一章讨论了一种束宽在传播过程中减小的涡旋光束，叫做环状光束（circular beam，CiB）。由于 CiB 具有一定的汇聚特性，在传播过程中它会表现出一种复原特性，这意味着在 CiB 各个 OAM 模上的概率分布在传播过程中会聚拢。这一现象与 Paterson 的理论预测相一致。
+
+\section{non-Kolmogorov湍流中CiB的OAM扩散特性}
+
+\subsection{non-Kolmogorov湍流中CiB的OAM扩散模型}
+
+CiB 是柱坐标下近轴波动方程的一个一般解，在特殊条件下，它可以退化为一些比较常见的涡旋光束，比如：LGB，贝塞尔-高斯光束 （Bessel–Gauss beam，BGB），超几何光束（hypergeometric beam，HyGB），HyGGB 以及 WGB 等。沿 $z$ 方向传播的 CiB 的归一化复振幅为：
+\begin{equation}\label{cib}
+  \begin{array}{rl}
+    \mathrm{CiB}^{(q_0,q_1)}_{p,l_0}(r,\varphi,z)&\displaystyle=\left(\mathrm{i}\sqrt{2}\frac{z_0}{W_0}\right)^{\left|l_0\right|+1}%
+    \left[\pi\left|l_0\right|!\Psi^{(\xi)}_{p,l_0}\right]^{-\frac{1}{2}}\frac{1}{q(z)}%
+    \exp\left[-\frac{\mathrm{i}kr^2}{2q(z)}\right]\\[0.5cm]%
+    &\displaystyle\times\left[(1+\xi)\frac{\widetilde{q}(z)}{q(z)}\right]^\frac{p}{2}%
+    \left[\frac{r}{q(z)}\right]^{\left|l_0\right|}{}_1\mathrm{F}_1\left(-\frac{p}{2},\left|l_0\right|+1;\frac{r^2}{\chi^2(z)}\right)\exp(\mathrm{i}l_0\varphi)
+  \end{array}
+\end{equation}
+\noindent 在公式 \eqref{cib} 中可以看到，CiB 有三个参数：$q_0$, $q_1$ 和 $p$, 其中 $q_0=\mathrm{i}z_0-d_0$。$l_0$ 是OAM量子数. $W_0$ 是一个类似于高斯光束束腰半径的物理量，它的大小与光束的尺寸有关。$z_0=kW_0^2/2$ 类似于波数为 $k$ 的 Rayleigh 长度。 另外，这里还有四个参数的定义需要说明：$q(z)=q_0+z$, $\widetilde{q}(z)=q_1+z$,
+$\xi=(q_1-q_0)/(q^*_0-q_1)$ 以及 $1/\chi^2(z)=\mathrm{i}k\left[1/q(z)-1/\widetilde{q}(z)\right]/2$. $q(z)$ 以及 $\widetilde{q}(z)$ 类似于高斯光束的 $q$ 参数，$1/\chi^2(z)$ 是缩放系数。 $\Psi^{(\xi)}_{p,l_0}={}_2\mathrm{F}_1\left(-p/2,-p^*/2,\left|l_0\right|+1;\left|\xi\right|^2\right)$ 是归一化系数。${}_1\mathrm{F}_1$ 和 ${}_2\mathrm{F}_1$ 分别是合流超几何函数以及超几何函数。
+
+在弱湍流区域，强度上的畸变或者说闪烁相对于相位上的畸变来说是很小的，所以湍流效应对于光束的作用可以认为是纯相位的。经过大气湍流的CiB的复振幅可以表示为：
+ \begin{equation}\label{cib with fluctuation}
+  \Psi^{(q_0,q_1)}_{p,l_0}(r,\varphi,z)=\mathrm{CiB}^{(q_0,q_1)}_{p,l_0}(r,\varphi,z)\cdot\exp[\mathrm{i}\psi(r,\varphi,z)]
+\end{equation}
+\noindent 在公式 \eqref{cib with fluctuation} 中，$\Psi(r,\varphi,z)$ 表示相位扰动。因为任意的复振幅都可以表示为螺旋谐波叠加的形式\citeup{}，因此经过大气湍流的CiB的复振幅还可以表示为
+\begin{equation}\label{expansion in spiral harmonics}
+  \Psi^{(q_0,q_1)}_{p,l_0}(r,\varphi,z)=\frac{1}{\sqrt{2\pi}}\sum\limits_{l=-\infty}^\infty\beta^{(q_0,q_1)}_{p,l_0,l}(r,z)\exp(\mathrm{i}l\varphi)
+\end{equation}
+\noindent 在公式 \eqref{expansion in spiral harmonics} 中，由于各谐波之间是相互正交的，因此可利用其正交性，计算出各螺旋谐波的系数：
+\begin{equation}\label{expansion coefficients}
+  \beta^{(q_0,q_1)}_{p,l_0,l}(r,z)=\frac{1}{\sqrt{2\pi}}\int_0^{2\pi}\mathrm{CiB}^{(q_0,q_1)}_{p,l_0}(r,\varphi,z)
+  \exp[\mathrm{i}\psi(r,\varphi,z)]\exp(-\mathrm{i}l\varphi)\mathrm{d}\varphi
+\end{equation}
+\noindent 在公式 \eqref{expansion coefficients} 中，由于相位扰动项 $\psi(r,\varphi,z)$ 是一个随机变量，因此$\beta^{(q_0,q_1)}_{p,l_0,l}(r,z)$ 也是随机变量。为了方便讨论，我们主要关注随机变量的总体平均，则有
+\begin{equation}
+  \begin{array}{rl}\label{turbulence statistics}
+    \left<\left|\beta^{(q_0,q_1)}_{p,l_0,l}(r,z)\right|^2\right>=&\displaystyle\frac{1}{2\pi}\int_0^{2\pi}\int_0^{2\pi}
+      \mathrm{CiB}^{(q_0,q_1)}_{p,l_0}(r,\varphi_1,z)\mathrm{CiB}^{(q_0,q_1)*}_{p,l_0}(r,\varphi_2,z)\\[0.5cm]
+    &\times\exp[-\mathrm{i}l(\varphi_1-\varphi_2)]\left<\exp\{\mathrm{i}\left[\psi(r,\varphi_1,z)-\psi(r,\varphi_2,z)\right]\}\right>
+     \mathrm{d}\varphi_1\mathrm{d}\varphi_2
+  \end{array}
+\end{equation}
+\noindent 其中 $\langle\dot\rangle$ 表示总体平均。在 non-Kolmogorov 湍流中，有\citeup{}
+\begin{equation}\label{phase statistics}
+  \left<\exp\{\mathrm{i}\left[\psi(r,\varphi_1,z)-\psi(r,\varphi_2,z)\right]\}\right>
+  =\exp\left[-\frac{2r^2-2r^2\cos(\varphi_1-\varphi_2)}{\rho_0^2}\right]
+\end{equation}
+\noindent 公式 \eqref{phase statistics} 中 $\rho_0$ 表示球面波在 non-Kolmogorov 湍流中传播时的相干长度，其表达式见公式 \ref{}。从公式 \eqref{turbulence statistics} 和 \eqref{phase statistics} 中可以得到：
+\begin{equation}\label{turbulence statistics simple}
+  \begin{array}{rl}
+    \left<\left|\beta^{(q_0,q_1)}_{p,l_0,l}(r,z)\right|^2\right>=&\displaystyle\frac{1}{2^{\left|l_0\right|}\left|l_0\right|!\Psi^{(\xi)}_{p,l_0}}
+    \left(\frac{kW_0}{\left|q(z)\right|}\right)^{2\left|l_0\right|+2}\left|\left[(1+\xi)\frac{\widetilde{q}(z)}{q(z)}\right]^p\right|\\[0.5cm]
+    &\times\displaystyle\exp\left(-\frac{k^2r^2W^2_0}{2\left|q(z)\right|^2}\right)\left|{}_1F_1\left(-\frac{p}{2},\left|l_0\right|+1;\frac{r^2}{\chi^2(z)}\right)\right|^2\\[0.5cm]
+    &\times\displaystyle
+    r^{2\left|l_0\right|}\exp\left(-\frac{2r^2}{\rho^2_0}\right)\mathrm{I}_{l-l_0}\left(\frac{2r^2}{\rho^2_0}\right)
+  \end{array}
+\end{equation}
+\noindent 其中 $\mathrm{I}_{l-l_0}$ 为阶数为 $l-l_0$ 的第一类修正贝塞尔函数。通过对接收到的每个模式上的能量 $P_l=\int_0^{+\infty}\left<\left|\beta^{(q_0,q_1)}_{p,l_0,l}(r,z)\right|^2\right>r\mathrm{d}r$ 进行归一化以后，我们可以得到其在整个接收能量中的比重：
+\begin{equation}\label{power weight}
+  C_l=\frac{P_l}{\sum_{m=-\infty}^\infty P_m}
+\end{equation}
+\noindent 在公式 \eqref{power weight} 中，$C_{l}$ 表示接收的 OAM 本征态为 $\ket{l}$ 的概率，特别地，$C_{l_0}$ 表示发射的单光子为初始 OAM 本征态 $\ket{l_0}$ 的概率。假设光束在大气中没有能量损耗以及接收孔径是无穷大的，则有 $C_l=P_l$。 如果没有大气湍流的扰动存在，则有 $C_{l_0}$=1 以及 $C_{l\neq l_0}$=0；如果大气湍流存在，则对于任意的 $l$，有 $C_{l}\neq0$。本节中 $C_{l_0}$ 被叫做\textit{接收概率}，而 $C_{l\neq l_0}$ 被叫做\textit{串扰概率}。
+$C_{l}$ 的表示式可以被具体的给出。因为这一关系式成立：$\mathrm{I}_n(x)= \mathrm{I}_{-n}(x)$，所以公式 (\ref{power weight}) 中有 $C_{l_0-l}=C_{l-l_0}$。如果需要讨论在任意 $l$ 下 $C_{l}$ 的取值，则只需讨论 $l\geq l_0$ 下的取值即可。当$l\geq l_0$ 时，利用文献\cite{} 中的公式 (6.622) 可以得到
+\begin{equation}\label{detail power weight}
+  \begin{array}{rl}
+    C_l=&\displaystyle\frac{\mathrm{i}(-1)^{\left|l_0\right|+1}kW_0\rho_0}{\sqrt{2\pi}\left|q(z)\right|\cdot\left|l_0\right|!\Psi^{(\xi)}_{p,l_0}}\left(\frac{\eta-1}{\eta+1}\right)^{\frac{\left|l_0\right|}{2}+\frac14}\left|\left[(1+\xi)\frac{\widetilde{q}(z)}{q(z)}\right]^p\right|\\[0.5cm]
+    &\displaystyle\times\sum\limits_{m=0}^\infty\sum\limits_{n=0}^\infty\frac{\left(-\frac{p^*}{2}\right)_m\left(-\frac{p}{2}\right)_n}{\left(\left|l_0\right|+1\right)_m\left(\left|l_0\right|+1\right)_nn!m!}\\[0.5cm]
+    &\displaystyle\times\left[-\frac{\rho_0^2}{2(\chi^2)^*\left(\eta^2-1\right)^\frac12}\right]^m\left[-\frac{\rho_0^2}{2\chi^2\left(\eta^2-1\right)^\frac12}\right]^{n}Q^{\left|l_0\right|+n+m+\frac12}_{l-l_0-\frac12}(\eta)
+  \end{array}
+\end{equation}
+\noindent 其中 $\eta=\frac{k^2W_0^2\rho_0^2}{4|q(z)|^2}+1$， $(\dot)_n$ 表示 Pochhammer 符号，$Q_\nu^\mu(\ast)$ 表示第二类缔合勒让德函数。
+
+\subsection{数值计算及分析}
+
+在这一节里，我们主要讨论 non-Kolmogorov 湍流对波函数为 CiB 模的单光子的接收概率及串扰概率的影响。讨论的理论来源主要是公式 \eqref{turbulence statistics simple} 或者公式 \eqref{detail power weight}。 为了方便讨论，这里假定 CiB 的规模参数 $W_0$ 为 0.04 m，$q_1$ 为 1200 m。另外，CiB的波长假定为 $\lambda$=1550 nm。为了描述 CiB 的汇聚特性，我们用二阶矩来计算其束宽：
+\begin{equation}\label{beam radii}
+  W^2(z)=4\left<r^2\right>=4 \iint r^2\left|\mathrm{CiB}^{(q_0,q_1)}_{p,l_0}(\vec{r},z)\right|^2\mathrm{d}^2\vec{r}\hspace{0.5cm}(z \geq 0)
+\end{equation}
+\\
+\begin{pics}[H]{束腰位置 $z_e$ 随 CiB 参数的变化。}{Fig3_3.eps}
+\addsubpic{ $z_e$ 与参数 Re($q_0$) 和 Re($q_1$) 的关系，这里 $p$=2+20i}{width=0.47\textwidth}{Fig3_3a.eps}
+\addsubpic{ $z_e$ 与参数 $p$ 的关系，这里Re($q_0$)=Re($q_1$)=0 m}{width=0.45\textwidth}{Fig3_3b.eps}
+\addsubpic{ $z_e$ 与参数 Re($q_0$) 和 Re($q_1$) 的关系，这里 $p$=2+10i}{width=0.47\textwidth}{Fig3_3c.eps}
+\addsubpic{ $z_e$ 与参数 $p$ 的关系，这里 Re($q_0$)=Re($q_1$)=1000 m。其他参数：$l_0$ = 1，$C^2_n=10^{-15}\mathrm{m}^{3-\alpha}$，$\alpha$= 3.67。}{width=0.45\textwidth}{Fig3_3d.eps}
+\end{pics}
+
+\noindent 公式 \eqref{beam radii} 中 $\vec{r}$ 表示 CiB 横截面上的位置矢量，$r$ 表示径向距离. 光腰所在的位置表示为 $z_e$。如果 $z_e>0$, 我们说 CiB 光束是汇聚的；如果 $z_e$=0, 我们说 CiB 光束是发散的。下面利用 Mathematica 软件对理论模型做数值计算。
+
+如果 $z_e$ 可以通过 CiB 的参数进行调节，那么 CiB 在通信中应用的可行性会得到增加。原因会在下面的内容中进行说明，这里首先讨论 CiB 的参数怎样影响 $z_e$。 在图 \ref{Fig3_3.eps} 中，我们探讨了 $z_e$ 随 Re($q_0$)，Re($q_1$) 和 $p$ 的变化。选取这几个参数的原因在于它们对 $z_e$ 有较为显著、不太容易预知的影响。我们可以看到在图 \ref{Fig3_3.eps}(a)-(d) 中的曲线上有一些不可导的点，这些点的存在不具有物理上的意义，仅仅是因为公式 \eqref{beam radii} 中给出了一个限制条件：$z_e\geq0$。 图 \ref{Fig3_3.eps}(a) 和图 \ref{Fig3_3.eps}(c) 描述了 Re($q_0$) 和 Re($q_1$) 对 $z_e$ 的影响。我们可以看到 Re($q_1$) 与 $z_e$ 的关系几乎是线性的，这说明了高斯包络的光腰位置与 CiB 的光腰位置之间有一种较为直接的关系。这一关系决定了 Re($q_1$) 对 $z_e$ 可以产生较大的影响。当 Re($q_1$) 小于 2000 m 左右时 $z_e$ 为正，此时 CiB 是汇聚的；当 Re($q_1$) 超过大概 2000 m 时 $z_e$ 为 0，此时 CiB 是扩散的。图 \ref{Fig3_3.eps}(b) 和图 \ref{Fig3_3.eps}(d) 描述了 Im($p$) 和 Re($p$) 对 $z_e$ 的影响。从两个图中我们可以看到，Im($p$) 从 0 增加到 5 时，$z_e$ 急剧的增加，而 Im($p$) 从 5 往上增加时，$z_e$ 缓慢的下降。当 Re($p$) 增加时，$z_e$ 几乎线性的增加。值得注意的是，当 Im$(p)\leq0$ 时 $z_e$=0。因此一些可以由 CiB 导出，并且径向系数 $p$ 为实数的涡旋光束不具有汇聚特性。
+
+
+图 \ref{Fig3_4.eps} 展示了两种参数的 CiB 在弱湍流中传播时的强度分布及束宽变化。图 \ref{Fig3_4.eps}(a) 展示了当 Im($p$)=20 时，CiB 在弱湍流中的强度在 x-z 平面上的分布。从图中我们可以看到，CiB 在传播过程中经历了先汇聚后发散的过程。在传播距离超过大约 1600 m 时，CiB 的主瓣周围出现的一个旁瓣。图 \ref{Fig3_4.eps}(b) 展示了当 Im($p$)=20 时， CiB 的束宽在传播过程中的变化。在 0 到 5000 m 的范围内 CiB 的束宽 $W(z)$ 小于 200 mm，这一较小的束宽利于低损耗的发射和接收 CiB 模。另外可以通过公式 \eqref{beam radii} 算出，束腰的位置 $z_e$ 为 2264 m，并且束腰在 $z$=0 以及 $z_e$ 处的差值大约为 100 mm。当 Im($p$)增大到 40 时，CiB 的发散角变大，束腰半径几乎没有变化，束腰位置只有微小的改变，如图 \ref{Fig3_4.eps}(c) 和图 \ref{Fig3_4.eps}(d)所示。
+
+图 \ref{Fig3_4sup.eps} 较为直观地展示了 CiB 的强度和相位在其横截面上的分布。图 \ref{Fig3_4sup.eps}(a) 给出了 CiB 横截面在不同传播距离处的强度分布。我们可以看到，CiB 的强度分布在 2264 m 处比在 0 和 5000 m 更为集中。图 \ref{Fig3_4sup.eps}(b) 展示了 CiB 在没有湍流时的相位分布。值得注意的是，在 $z_e$ 处 CiB 的相位分布具有不同于常见涡旋光束（如：LG, BG）的特征\citeup{}。 图 \ref{Fig3_4sup.eps}(c) 给出了 CiB 在经过大气湍流后不同距离处横截面的相位分布图。需要说明的是，在相位分布中当颜色从黑色过渡到白色时，相位从 0 过渡到 $2\pi$。
+
+\begin{pics}[H]{波长为 $\lambda$=1550 nm 的 CiB 在自由空间中传播时的强度分布和束宽。}{Fig3_4.eps}
+\addsubpic{ CiB在自由空间中传播时 $x-z$ 平面上的强度分布，这里$p$=2+20i}{width=0.9\textwidth}{Fig3_4a.eps}
+\addsubpic{ CiB的束宽 $W(z)$ 随传播距离 $z$ 的变化。这里$p$=2+20i}{width=0.9\textwidth}{Fig3_4b.eps}
+\addsubpic{ CiB在自由空间中传播时 $x-z$ 平面上的强度分布，这里 $p$=2+50i}{width=0.9\textwidth}{Fig3_4c.eps}
+\addsubpic{ CiB的束宽 $W(z)$ 随传播距离 $z$ 的变化。这里 $p$=2+50i。其他参数：$q_1$=1200i m， $l_0$=1。}{width=0.9\textwidth}{Fig3_4d.eps}
+\end{pics}
+
+\begin{pics}[H]{CiB 在大气湍流和自由空间中的强度分布和相位分布。}{Fig3_4sup.eps}
+\addsubpic{ CiB 在 $x-y$ 平面的强度分布}{width=1\textwidth}{Fig3_4supa.eps}
+\addsubpic{ 没有湍流时，CiB 在 $x-y$ 平面的相位分布}{width=1\textwidth}{Fig3_4supb.eps}
+\addsubpic{ 当 CiB 经过大气湍流时，畸变的 CiB 在 $x-y$ 平面的相位分布。从第一列到第三列的传播距离分别为 $z$=0，~2264 m，~5000 m。 其他参数：$\alpha$=3.67，$\mathrm{C}^2_n=10^{-15}\mathrm{m}^{3-\alpha}$，$q_1$=1200i m, $\lambda$=1550 nm，$l_0$=1。$p$=2+20i。}{width=1\textwidth}{Fig3_4supc.eps}
+\end{pics}
+
+\begin{pics}[H]{初始 CiB 模的探测概率 $C_{l_0}$ 随传播距离 $z$ 的变化。}{Fig3_5.eps}
+\addsubpic{ $\alpha$=3.97，$\mathrm{C}^2_n=10^{-15}\mathrm{m}^{3-\alpha}$，Im($p$)= 20，$l_0$=1}{width=0.45\textwidth}{Fig3_5a.eps}
+\addsubpic{ $l_0=1$，$\mathrm{C}^2_n=10^{-15}\mathrm{m}^{3-\alpha}$，$p$=2+20i}{width=0.45\textwidth}{Fig3_5b.eps}
+\addsubpic{ $\alpha$=3.67, $l_0$=1, $p$=2+20i}{width=0.45\textwidth}{Fig3_5c.eps}
+\addsubpic{ $\alpha$=3.67，$\mathrm{C}^2_n=10^{-15}\mathrm{m}^{3-\alpha}$，$p$=2+20i}{width=0.45\textwidth}{Fig3_5d.eps}
+\addsubpic{ $\alpha$=3.67，$\mathrm{C}^2_n=10^{-15}\mathrm{m}^{3-\alpha}$，$p$=2+20i。}{width=0.45\textwidth}{Fig3_5e.eps}
+\addsubpic{ $\alpha$=3.67，$\mathrm{C}^2_n=10^{-14}\mathrm{m}^{3-\alpha}$，$l_0$=1。(a)-(f) 中 “O” 表示 $z_e$ 的位置。其他参数：$q_1$=1200i m。}{width=0.45\textwidth}{Fig3_5f.eps}
+\end{pics}
+
+图 \ref{Fig3_5.eps} 展示了在不同径向指数、OAM 量子数以及不同湍流下探测概率 $C_{l_0}$ 随传播距离 $z$ 的变化。另外，图中画出了 $z_e$ 的位置。从图 \ref{Fig3_5.eps} 中可以看到，随着 Re($p$) 的增大，$z_e$ 增大。随着传播距离 $z$ 的变大，$C_{l_0}$ 总体减小，但在 $z_e$ 附近出现了一个隆起，并且在 $z_e$ 处达到一个极值。另外，随着 Re($p$) 的增大，$z_e$ 处的极大值减小，这是因为较大的 Re($p$) 带来了较大的束宽，这样便使得 CiB 更加易于被相位扰动影响。图 \ref{Fig3_5.eps}(b) 和 (c) 描述了不同的湍流条件下 $C_{l_0}$  随着传播距离 $z$ 的变化。我们可以看到，随着$\mathrm{C}^2_n$，$\lambda$ 的增加，$C_{l_0}$ 下降，但 $z_e$ 附近的隆起会变得更加明显。在 $\mathrm{C}^2_n$，$\lambda$ 较小时，$C_{l_0}$ 几乎没有下降，并且在 $z_e$ 附近的隆起是不明显的。另外，可以看到湍流条件的的变化对 $z_e$ 没有影响。这是因为 $z_e$ 只和 CiB 的强度分布有关，所以相位扰动不会改变 $z_e$ 的值。图 \ref{Fig3_5.eps}(d) 描述了在不同的低阶 OAM 量子数 $l_0$ 下 $C_{l_0}$ 随传播距离 $z$ 的变化。我们可以看到，随着 $l_0$ 的增加，$C_{l_0}$ 下降得更快，在 $z_e$ 附近的隆起越不明显。这是因为 $l_0$ 的增加使得 CiB 的束宽增加，并使得汇聚效应减弱。在图 \ref{Fig3_5.eps}(e) 中展现了几种常用的波长对 $C_{l_0}$ 的影响。从图中可以看出，随着波长减小， $C_{l_0}$ 减小，但在束腰位置附近的隆起变得明显。图 \ref{Fig3_5.eps}(f) 种展现了 Im($p$) 对 $C_{l_0}$ 的影响。从图中可以看出，随着 Im($p$) 的增大，恢复效应出现并变得明显。当 Im($p$)=0 或 10 时，$C_{l_0}$ 在束腰位置附近没有隆起，但 Im($p$)=10 时 $C_{l_0}$ 的下降在束腰位置处有所减缓。从图 \ref{Fig3_4.eps}(b) 和 (d) 可知，CiB 在 Im($p$)=10 时汇聚，所以这说明了汇聚特性并不一定使得 CiB 具有恢复效应。
+
+\pic[H]{大气湍流中一种 CiB 初始模的检测概率 $C_{l_0}$ 随束腰宽度 $W$ 的变化。} {width=0.5\textwidth}{Fig3_6sup.eps}
+
+图 \ref{Fig3_6sup.eps} 研究一种 CiB 初始模在束腰位置处的检测概率与其束腰宽度的关系。这里初始 OAM 量子数 $l_0$ 的值为 1，另外大气湍流的折射率结构常数 $C_n^{2}$ 和湍流系数 $\alpha$ 分别取 $10^{-14}$ 和 3.97。这里束腰宽度的不同是通过改变 Re($p$) 的取值获得。从图中可以看出，当束腰宽度增加时，检测概率几乎线性的下降。这一例子能够反映出在同样的湍流条件下，CiB 汇聚程度的增强能够增加其 OAM 初始模的接收概率。
+
+图 \ref{Fig3_6.eps} 给出了 CiB 在经过弱扰动区域时初始 OAM 模扩散到其他模式上的串扰概率。在图 \ref{Fig3_6.eps}(a)-(d) 中我们可以看到，初始 OAM 模在其他模式特别是相邻模式上的串扰概率在 $z_e$ 附近下降，在其他地方随着传播距离的增加而增加。另外，从图中可以看到随着 $\Delta l$ 增加，串扰概率 $C_l$ 减小。对比 \ref{Fig3_6.eps}(a)-(d) 可以发现，随着 $\mathrm{C}^2_n$ 或者 $\alpha$ 的增加, 串扰概率在 $z_e$ 处的下降幅度增加。在图 \ref{Fig3_6.eps}(d) 中可以看到相邻模式 \linebreak[4]
+
+\begin{pics}[H]{当 $\Delta$$l$=$|l-l_0|$ 取不同的值时串扰概率 $C_{l}$ 随传播距离 $z$ 的变化。}{Fig3_6.eps}
+\addsubpic{  $\alpha$=3.67，$\mathrm{C}^2_n=10^{-15}\mathrm{m}^{3-\alpha}$}{width=0.47\textwidth}{Fig3_6a.eps}
+\addsubpic{  $\alpha$=3.97，$\mathrm{C}^2_n=10^{-15}\mathrm{m}^{3-\alpha}$}{width=0.47\textwidth}{Fig3_6b.eps}
+\addsubpic{  $\alpha$=3.67，$\mathrm{C}^2_n=5\times 10^{-15}\mathrm{m}^{3-\alpha}$}{width=0.47\textwidth}{Fig3_6c.eps}
+\addsubpic{  $\alpha$=3.97，$\mathrm{C}^2_n=5\times 10^{-15}\mathrm{m}^{3-\alpha}$。 其他参数为：$l_0$=1，$\lambda$=1550nm，$p$=2+20i 以及 $q_1$=1200i m。}{width=0.47\textwidth}{Fig3_6d.eps}
+\end{pics}
+
+\noindent 上的串扰概率 $C_l$ 在传播距离 $z$ 较大时有下降趋势, 这和 LG 光束在弱湍流中的串扰概率趋势是相同的\citeup{}。串扰概率 $C_l$ 在 $z_e$ 附近下降的原因是初始 CiB 模的探测概率 $C_{l_0}$ 在 $z_e$ 附近上升到一个极大值（见图 \ref{Fig3_5.eps}），因此转变为其他模的概率减小。从图 \ref{Fig3_6.eps} 中给出的数据可以推测，假设在大气通信链路中用 CiB 模作为复用信道，那么通信的模间串扰会在 $z_e$ 附近达到一个极小值，并且这一现象在相位扰动更为强烈的区域中会更加明显。
+
+\begin{pics}[H]{串扰概率 $C_l$ 随距离 $z$ 的变化。}{Fig3_7.eps}
+\addsubpic{ $z$=0}{width=0.43\textwidth}{Fig3_7a.eps}
+\addsubpic{ $z$=1000 m}{width=0.43\textwidth}{Fig3_7b.eps}
+\addsubpic{ $z$=2264 m}{width=0.43\textwidth}{Fig3_7c.eps}
+\addsubpic{ $z$=3000 m。其他参数为：$\alpha$=3.97，$\mathrm{C}^2_n=10^{-14}\mathrm{m}^{3-\alpha}$，$\lambda$=1550 nm，$p$=2+20i 以及 $q_1$=1200i m。}{width=0.43\textwidth}{Fig3_7d.eps}
+\end{pics}
+
+图 \ref{Fig3_7.eps} 描述了 CiB 在大气湍流中穿过不同距离后，其能量在各个 OAM 模上分布。分布能量的多少也意味着 初始 OAM 态转变为各个 OAN 态的概率。在图 \ref{Fig3_7.eps} 中，我们可以看到当 CiB 从 0 传播到 1000 m 时，随着传播距离 $z$ 的增加， 概率分布越分散。而当 CiB 从 1000 m 传播到 2264 m 时，概率分布反而出现了以初始 OAM 态为中心的聚拢。在概率分布聚拢的过程中，其他 OAM 态尤其是相邻态的探测概率出现了下降。因此，恢复效应意味着探测概率分布的聚拢，初始 OAM 态检测概率的增加只是 OAM 概率分布聚拢的一个侧面表现。
+
+\section{汇聚涡旋光束在大气湍流中复原的原因}
+上一小节主要通过研究一类特殊的汇聚涡旋光束（CiB 光束）在 non-Kolmogorov 湍流中的传播特性，以说明汇聚的 CiB 具有恢复效应。这一效应使得扩散的 OAM 在一定程度上重新聚拢。 这一小节主要对普遍意义下的涡旋光束作出考察，说明为什么汇聚涡旋光束的 OAM 模会在大气湍流中重新复原。Paterson 在他的工作中已经指出，接收到的涡旋光束的束宽越小，那么初始 OAM 态的探测概率就会越大\citeup{}。这里将表明，复振幅为$\Psi(r,\varphi,z)=R(r,z)\exp{(\mathrm{i}l\varphi)/\sqrt{2\pi}}$ 形式的涡旋光束只要以一定速率在大气湍流中汇聚，它们就会表现出复原特性。
+
+一般来说，一种任意的 OAM 模沿 $z$ 轴传播经过某种介质时可表示为：
+\begin{equation}\label{OAM_mode_medium}
+  \Phi(r,\varphi,z)=\Pi(r,\varphi,z)\Psi(r,\varphi,z)=\Pi(r,\varphi,z)R_{l_0}^p(r,z)\frac{\exp(\mathrm{i}l_0\varphi)}{\sqrt{2\pi}}
+\end{equation}
+\noindent 这里 $\Pi(r,\varphi,z)$ 可以是一种任意介质的透过率函数并且假设 $|\Pi(r,\varphi,z)|^2\leq 1$。 $R_{l_0}^p(r,z)\exp(\mathrm{i}l_0\varphi)/\sqrt{2\pi}$ 表示任意的 OAM 模，这里 $p$ 和 $l_0$ 分别表示径向指数和 OAM 量子数。另外，$\Phi(r,\varphi,z)$ 还可以表示为一组螺旋谱叠加的形式：
+\begin{equation}\label{in_spiral_OAM_harmonics}
+  \Phi(r,\varphi,z)=\frac{1}{\sqrt{2\pi}}\sum\limits_{l=-\infty}^\infty C_l\exp(\mathrm{i}l\varphi)
+\end{equation}
+\noindent 因为各螺旋谱之间是相互正交的，因此螺旋谱系数 $C_l$ 可表示为
+\begin{equation}\label{harmonics_index}
+  C_l=\frac{1}{2\pi}\int_0^{2\pi}\Pi(r,\varphi,z)R_{l_0}^p(r,z)\exp(-\mathrm{i}\Delta l\varphi)\mathrm{d}\varphi
+\end{equation}
+\noindent 这里 $\Delta l=l_0-l$。通过公式 \eqref{harmonics_index} 可以算出本征态 $\ket{l}$ 的检测概率
+\begin{equation}\label{Detection_Prob}
+ \begin{split}
+ P(l)=& \int_0^{\infty}\left|C_l\right|^2rdr\\
+     =&\frac{1}{4\pi^2}\int_0^{\infty}\left|\int_0^{2\pi}\Pi(r,\varphi,z)R_{l_0}^p(r,z)\exp(-\mathrm{i}\Delta l\varphi)\mathrm{d}\varphi\right|^2rdr\\
+ =& \frac{1}{4\pi^2}\int_0^{\infty}\left|R_{l_0}^p(r,z)\right|^2\left|\int_0^{2\pi}\Pi(r,\varphi,z)\exp(-\mathrm{i}\Delta l\varphi)\mathrm{d}\varphi\right|^2rdr
+ \end{split}
+\end{equation}
+\noindent 这里旋转场函数\citeup{} 可以表示为：
+\begin{equation}\label{Rotating_Field_Function}
+ \begin{split}
+ A_{\Delta l}(r)=\frac{1}{4\pi^2}\left|\int_0^{2\pi}\Pi(r,\varphi,z)\exp(-\mathrm{i}\Delta l\varphi)\mathrm{d}\varphi\right|^2
+ \end{split}
+\end{equation}
+\noindent 公式 \eqref{Rotating_Field_Function} 指出了当 $\Delta l$ 确定时，$A_{\Delta l}(r)$ 仅仅依赖于介质特性所确定的 $\Pi(r,\varphi,z)$，与 OAM 模的类型以及波长无关。另外从公式 \eqref{Rotating_Field_Function} 中可以得到一个结论：对于任意的径向距离 $r$，都有 $1\geq A_{\Delta l}(r)\geq 0$。 将公式 \eqref{Rotating_Field_Function} 带入到公式 \eqref{Detection_Prob} 中可以得到：
+\begin{equation}\label{Detection_Prob2}
+ \begin{split}
+ P(l)=\frac{1}{4\pi^2}\int_0^{\infty}|R_{l_0}^p(r,z)|^2 A_{\Delta l}(r)rdr
+ \end{split}
+\end{equation}
+\noindent 公式 \eqref{Detection_Prob2} 表明 OAM 模的检测概率只取决于两个部分：$|R_{l_0}^p(r,z)|^2$ 和 $A_{\Delta l}(r)$。$|R_{l_0}^p(r,z)|^2$ 表示 OAM 模在径向方向上的强度分布。从公式 \eqref{Detection_Prob2} 中可以看出，当 OAM 模的能量在径向方向上集中在 $A_{\Delta l}(r)$ 的取值较大的范围内时，OAM 初始态的检测概率也相对较大。另外，因为波函数（或者归一化的复振幅函数）具有性质： $\int_0^{\infty}|R_{l_0}^p(r,z)|^2 rdr$=1， 所以根据公式 \eqref{Detection_Prob2} 有
+\begin{equation}\label{inequation1}
+\begin{split}
+P(l)\leq & \frac{1}{4\pi^2}\int_0^{\infty}|R_{l_0}^p(r,z)|^2 [A_{\Delta l}(r)]_{max}rdr\\
+        =& [A_{\Delta l}(r)]_{max}\frac{1}{4\pi^2}\int_0^{\infty}|R_{l_0}^p(r,z)|^2rdr=[A_{\Delta l}(r)]_{max}
+\end{split}
+\end{equation}\label{inequation1}
+\noindent 即
+\begin{equation}\label{inequation}
+ \begin{split}
+ P(l)\leq [A_{\Delta l}(r)]_{max}
+ \end{split}
+\end{equation}
+\noindent 在公式 \eqref{inequation} 中，$[A_{\Delta l}(r)]_{max}$ 表示 $A_{\Delta l}(r)$ 在 $r\in[0,\infty)$ 时的最大值。从数学上可以假设当 $[A_{\Delta l}(r)]_{max}=A_{\Delta l}(r')$，并且当光束的能量完全集中于半径为 $r$ 的圆环上即 $|R_{l_0}^p(r,z)|^2=\delta (r-r')$ 时, 公式 \eqref{inequation} 中的等号成立。但是我们知道在实际中不可能存在能量完全集中于一个圆环上的光束。不过这一分析给出了公式 \eqref{inequation} 的一个物理意义：用于反映传播介质特性的旋转场函数 $A_{\Delta l}(r)$ 完全确定了在随机介质中初始 OAM 态转变为任意一个 OAM 态的概率上限。当传输介质为弱 non-Kolmogorov 湍流时，介质的透过率函数可以表示为纯相位扰动： $\Pi(r,\varphi,z)=\exp[\mathrm{i}\psi(r,\varphi,z)]$，这时旋转场函数 $A_{\Delta l}(r)$ 可以表示为
+\begin{equation}\label{non-Kolmogorov_RFF}
+ \begin{split}
+ A_{\Delta l}(r)=\exp\left(-\frac{2r^2}{\rho^2_0}\right)\mathrm{I}_{\Delta l}\left(\frac{2r^2}{\rho^2_0}\right)
+ \end{split}
+\end{equation}
+其中 $I_\Delta$ 表示阶数为 $\Delta$ 的第一类修正贝塞尔函数，这里 $\Delta$ 可以取任意整数并且有 $A_{\Delta l}(r)=A_{-\Delta l}(r)$。下面讨论在弱 non-Kolmogorov 湍流中旋转场函数 $A_{\Delta l}(r)$ 与径向距离 $r$ 的关系，并进而讨论为什么当涡旋光束的能量在传播过程中汇聚时其检测概率能够回升。
+
+\begin{pics}[H]{$A_{0}(r)$ 随 $z$，$\alpha$ 和 $\mathrm{C}^2_n$ 的变化。}{Fig3_8.eps}
+\addsubpic{ $A_{0}(r)$ 随传播距离 $z$ 的变化，这里$\alpha$=3.67，$\mathrm{C}^2_n=10^{-15}\mathrm{m}^{3-\alpha}$}{width=0.47\textwidth}{Fig3_8a.eps}
+\addsubpic{ $A_{0}(r)$ 随传播距离 $\alpha$ 的变化，这里 $z$=1000 m，$\mathrm{C}^2_n=10^{-15}\mathrm{m}^{3-\alpha}$}{width=0.47\textwidth}{Fig3_8b.eps}
+\addsubpic{ $A_{0}(r)$ 随传播距离 $\mathrm{C}^2_n$ 的变化，这里$z$=1000 m，$\alpha$=3.67。其他参数为：$l_0$=1，$\lambda$=1550nm。}{width=0.47\textwidth}{Fig3_8c.eps}
+\end{pics}
+
+图 \ref{Fig3_8.eps}(a)-(c) 展示了在几种不同的湍流中和不同的传输距离下 $A_{0}(r)$ 随 $r$ 的变化。我们可以看到，除了当 $z$=0 时 $A_{\Delta l}(r)$ 不变外，其余的情况下 $A_{\Delta l}(r)$ 都随 $r$ 的增加而减小。 从图 \ref{Fig3_8.eps}(a)-(c) 还可以看到，$z$，$\alpha$ 以及 $\mathrm{C}^2_n$ 增加时 $A_{\Delta l}(r)$ 下降得更快，这是因为相位浮动变得更严重了。从图 \ref{Fig3_8.eps}(a) 可以看到，常见的涡旋光束在传播过程中会相继受到下降得越来越快的 $A_{\Delta l}(r)$ 的影响，在加上它们自身的扩散，因此探测概率会越来越低。如果涡旋光束自身在传播过程中以足够快的速度汇聚，那么它们的能量会较快的聚集在 $r$ 较小的区域，这时探测概率反而会随着传播距离的增加而上升。
+
+\begin{pics}[H]{$A_{1}(r)$ 随 $z$，$\alpha$ 和 $\mathrm{C}^2_n$ 的变化。}{Fig3_9.eps}
+\addsubpic{ $A_{1}(r)$ 随传播距离 $z$ 的变化，这里$\alpha$=3.67，$\mathrm{C}^2_n=10^{-15}\mathrm{m}^{3-\alpha}$}{width=0.47\textwidth}{Fig3_9a.eps}
+\addsubpic{ $A_{1}(r)$ 随传播距离 $\alpha$ 的变化，这里 $z$=1000 m，$\mathrm{C}^2_n=10^{-15}\mathrm{m}^{3-\alpha}$}{width=0.47\textwidth}{Fig3_9b.eps}
+\addsubpic{ $A_{1}(r)$ 随传播距离 $\mathrm{C}^2_n$ 的变化，这里；$z$=1000 m，$\alpha$=3.67。其他参数为：$l_0$=1，$\lambda$=1550nm。}{width=0.47\textwidth}{Fig3_9c.eps}
+\end{pics}
+
+图 \ref{Fig3_9.eps}(a)-(c) 展示了在几种不同的湍流中和不同的传输距离下 $A_{1}(r)$ 随 $r$ 的变化。$A_{1}(r)$ 的意义在于能够解释在不同的湍流和传播距离下初始 OAM 态变成相邻 OAM 态的概率的变化，并能够估计其上限。我们可以看到，在图 \ref {Fig3_9.eps}(a)-(c) 中，所有曲线的最大值为 0.219。最大值恒定是因为 $z$，$\alpha$ 和 $\mathrm{C}^2_n$ 的变化只会使得 $\rho_0$ 发生变化，而通过公式 \eqref{non-Kolmogorov_RFF} 可知，$\rho_0$ 的变化不会影响 $A_{\Delta l}(r)$ 的最大值。这里我们可以说，在只考虑到相位浮动的湍流中，无论湍流是什么样的，无论是什么类型的 OAM 模，也无论传播距离多远，初始 OAM 态变成相邻态的概率不会超过 0.219。
 
 \section{本章小结}
-本章首先研究了时域积分方程时间步进算法的阻抗元素精确计算技术，分别采用DUFFY变换法与卷积积分精度计算法计算时域阻抗元素，通过算例验证了计算方法的高精度。
 
-\chapter{时域积分方程数值方法研究}
-\section{时域积分方程时间步进算法的阻抗元素精确计算}
-时域积分方程时间步进算法的阻抗元素直接影响算法的后时稳定性，因此阻
-抗元素的计算是算法的关键之一，采用精度高效的方法计算时域阻抗元素是时域
-积分方程时间步进算法研究的重点之一。
+本章主要研究了 CiB 在 non-Kolmogorov 湍流中的 OAM 扩散，并揭示了它所表现出的复原效应。数值计算表明，复原效应发生在 CiB 束腰位置附近，而束腰位置可以通过调节 CiB 的参数改变。复原效应意味着 OAM 态的探测概率能够随着传播距离的增加而增加，并且转变成其他 OAM 态的概率会相应减小。这一复原效应在较强的相位浮动中和 OAM 较小的情况下会更加明显。另外本章也指出了任何一种汇聚的涡旋光束都有可能在 non-Kolmogorov 湍流中产生复原效应。non-Kolmogorov 弱湍流的旋转场函数具有一种在径向上衰减的特征，这使得当涡旋光束在传播过程中能量汇聚得足够快时，其对应的 OAM 态的探测概率会随着传播距离的增大而增大。最后，通过对旋转场函数 $A_{1}(r)$ 的讨论能够得出，任意类型的 OAM 模在任意只考虑相位浮动的大气湍流下，其转变为相邻态的概率不会超过 0.219。
 
-\section{时域积分方程时间步进算法阻抗矩阵的存储}
-时域阻抗元素的存储技术也是时间步进算法并行化的关键技术之一，采用
-合适的阻抗元素存储方式可以很大的提高并行时间步进算法的计算效率。
+% !Mode:: "TeX:UTF-8"
 
-\subsection{时域积分方程时间步进算法产生的阻抗矩阵的特征}
+\chapter{二维OAM叠加态在大气湍流的协同效应}
+上一章主要讨论了一种汇聚的 OAM 本征模在大气湍流中发生相位畸变时的 OAM 扩散，并讨论了一种有用的现象：复原效应。在这一章里，另一种有用的现象将会被讨论到。我们知道在光的偏振复用技术中，可以分别利用左旋和右旋圆偏振光作为不同的通道，也可以利用一对正交的线偏振光作为不同的传输通道。圆偏振对应了自旋角动量的本征态，线偏振对应了自旋角动量的叠加态。对于轨道角动量来说，其本征态和叠加态也可被用于通信中。目前，有大量的工作对基于 OAM 本征模的通信做了研究，而对基于 OAM 叠加模的通信的研究则偏少。这一章主要讨论二维 OAM 叠加态 （dually superposed OAM states，DSOS）在 non-Kolmogorov 湍流中的检测概率，并给出相应的数学模型。
 
-由于时域混合场积分方程是时域电场积分方程与时域磁场积分方程的线性组
-合，因此时域混合场积分方程时间步进算法的阻抗矩阵特征与时域电场积分方程
-时间步进算法的阻抗矩阵特征相同。
-\subsection{数值算例与分析}
-如表\ref{tablea}所示给出了时间步长分别取0.4ns、0.5ns、0.6ns 时的三种存储
-方式的存储量大小。
+\section{OAM叠加态在non-Kolmogorov湍流中的探测概率模型}
+Bloch 球是量子领域一种常用的几何模型，它用于直观地描述二维叠加态的集合，并表示它们之间的关系。我们知道，传统邦加球可以表示光偏振态的叠加，特别地，在球的两极处分别为自旋的两个本征态。类似地，OAM 的 Bloch 球可以表示一个任意的 DSOS，并且 Bloch 球的两极分别为两个 OAM 本征态。一个 DSOS（$\ket{\xi}$）可以用 Bloch 球面上一个点表示，如图 \ref{Fig4_1.eps}。
 
-\begin{table}[h]
-\caption{计算$2m\times 2m$理想导体平板时域感应电流采用的三种存储方式的存储量比较。} 
-\begin{tabular}{|c|c|c|c|} 
-\hline  
-时间步长 & 非压缩存储方式 & 完全压缩存储方式 & 基权函数压缩存储方式 \\
-\hline 
-0.4ns & 5.59 MB & 6.78 MB & 6.78 MB\\  
-\hline  
-0.5ns & 10.17 MB & 5.58 MB & 5.58 MB \\  
-\hline  
-0.6ns & 8.38MB & 4.98 MB & 4.98 MB \\  
-\hline  
-\end{tabular}
-\label{tablea}
-\end{table}
+\pic[H]{二维 OAM 叠加态在 Bloch 球面上表示的示意图。}{width=0.5\textwidth}{Fig4_1.eps}
 
-如图\ref{picd}所示给出了时间步长选取为0.5ns 时采用三种不同存储方式计算的
-平板中心处$x$方向的感应电流值与IDFT 方法计算结果的比较，……。如图\ref{pice}
-所示给出了存储方式为基权函数压缩存储方式，时间步长分别取0.4ns、0.5ns、0.6ns
-时平板中心处$x$方向的感应电流计算结果，从图中可以看出不同时间步长的计算结果基本相同。
+\noindent 在图 \ref{Fig4_1.eps} 中，$\ket{\zeta}$ 表示 $\ket{\xi}$ 的对径态。假设有一束单色的、完全相干的光束在自由空间中沿着 $z$ 轴传播，并且其发射的位置为 $z$=0 的平面上。在柱坐标下，$\ket{\xi}$ 对应的波函数在 LG 模中可以被表示为
+\begin{equation}
+\begin{split}
+\xi_{p_0}(r,\varphi,z)=\mathrm{cos}\left(\frac{\beta}{2}\right)u_{p_0,n}^\mathrm{LG}(r,\varphi,z)+\mathrm{e}^{\mathrm{i}\theta}\mathrm{sin}\left(\frac{\beta}{2}\right)u_{p_0,m}^\mathrm{LG}(r,\varphi,z)
+\label{Eq1}
+\end{split}
+\end{equation}
+\noindent 这里 $u_{\ast,\ast}^\mathrm{LG}(r,\varphi,z)$ 表示归一化的 LG 模函数。俯仰角 $\beta$ 影响 DSOS 两个部分的权重，方位角 $\theta$ 决定 DSOS 两个部分之间的相对相位。另外，对于 Bloch 球面上的俯仰角 $\beta$ 和方位角 $\theta$ 有 $0 \leq \beta \leq \pi$ 以及 $0 \leq \theta < 2\pi$。当 $\beta=0$ 或 $\pi$ 时，DSOS 就退化为了 OAM 本征态。 $\ket{\xi}$ 与其对径态 $\ket{\zeta}$ 正交，并且其对径态可表示为：$\zeta_{p_0}(r,\varphi,z)=\mathrm{sin}(\beta/2)u_{p_0,n}^\mathrm{LG}(r,\varphi,z)-\mathrm{e}^{\mathrm{i}\theta}\mathrm{cos}(\beta/2)u_{p_0,m}^\mathrm{LG}(r,\varphi,z)$。
+为了方便起见，假设叠加态的发射面在 $z$=0 处，并假设两个 LG 模的模函数拥有相同的束腰宽度 $\omega_0$。
 
-由于时域混合场积分方程是时域电场积分方程与时域磁场积分方程的线性组合，因此时域混合场积分方程时间步进算法的阻抗矩阵特征与时域电场积分方程时间步进算法的阻抗矩阵特征相同。
+考虑  DSOS  在弱扰动区域中的演化特性。在弱扰动区域中相位扰动为主要扰动因素，强度扰动很小并可以被忽略掉。DSOS 经过弱扰动区域后在 $z$ 处的波函数可表示为：
+\begin{equation}
+\phi(r,\varphi,z)=\xi_{p_0}(r,\varphi,z)\exp{\left[\mathrm{i}\chi(r,\varphi,z)\right]}
+\label{Eq2},
+\end{equation}
+\noindent $\chi(r,\varphi,z)$ 对应于相位浮动。因为任意的复振幅函数都可以表示为一组 LG 模加和的形式\citeup{}，因此这里 $\phi(r,\varphi,z)$ 可以表示为：
+\begin{equation}
+\begin{split}
+\phi(r,\varphi,z)=&{\sum_{p}}{\sum_{l}}A_p^{l}(z)u_{p,l}^\mathrm{LG}(r,\varphi,z)\\
+                 =& {\sum_{p}}B_p(z)\xi_p(r,\varphi,z)+{\sum_{p}}C_p(z)\zeta_p(r,\varphi,z)+{\sum_{p}}{\sum_{l\neq{n},m}}A_p^{l}(z)u_{p,l}^\mathrm{LG}(r,\varphi,z)
+\label{Eq3}
+\end{split}
+\end{equation}
+\noindent  这里 $p$ 和 $l$ 分别表示 LG 模的径向指数和 OAM 量子数。$A_p^{l}(z)$，$B_p(z)$ 和$C_p(z)$ 均是只依赖于 $z$ 的系数。$B_p(z)$ 和 $C_p(z)$ 与 $A_p^{l}(z)$ 之间的关系式为
+\begin{equation}
+\begin{split}
+B_p(z)=\mathrm{cos}(\beta/2)A_p^{l=n}(z)+\mathrm{sin}(\beta/2)A_p^{l=m}(z)\mathrm{e}^{-\mathrm{i}\theta}
+\label{Eqsup1}
+\end{split}
+\end{equation}
+和
+\begin{equation}
+\begin{split}
+C_p(z)=\mathrm{sin}(\beta/2)A_p^{l=n}(z)-\mathrm{cos}(\beta/2)A_p^{l=m}(z)\mathrm{e}^{-\mathrm{i}\theta}
+\label{Eqsup2}
+\end{split}
+\end{equation}
+\noindent 易知$\{u_{p,l}^\mathrm{LG}(r,\varphi,z)|_{l\neq{n,m}},\xi_p(r,\varphi,z),\zeta_p(r,\varphi,z)\}_{p\in{\mathbb{N}}}$ 是一组完备正交基，可以表示任意的复振幅函数。因此，利用公式 (\ref{Eq3}) 中各个项之间的正交性，可得到系数 $B_p(z)$ 的积分表示式
+\begin{equation}
+  B_p(z)=\iint\phi(r,\varphi,z)\cdot\xi_p^\ast(r,\varphi,z)r\mathrm{d}r\mathrm{d}\varphi
+\label{Eq4}
+\end{equation}
+\noindent 大气湍流带来的相位扰动具有随机性。为了方便，这里考察相位扰动的统计特性。可以不失一般性地假设在大气湍流的弱扰动区域中没有能耗并且接收孔径是无穷大的。基于这样的假设，初始 DSOS 的检测概率可表示为
+\begin{equation}
+P(\xi|\xi,p_0)={\sum_p}\left\langle\left|B_p(z)\right|^2\right\rangle\equiv\sum_p P(\xi,p|\xi,p_0)
+\label{Eq5}
+\end{equation}
+\noindent 这里 $\langle\cdot\rangle$ 表示总体平均。将公式 \eqref{Eq4} 中的 $B_p(z)$ 的表达式带入到公式 \eqref{Eq5} 中，可得到 $P(\xi|\xi,p_0)$ 的 $p$ 阶项
+\begin{equation}
+  \begin{split}
+  P(\xi,p|\xi,p_0)=& \iint\iint\xi_{p_0}(r_1,\varphi_1,z)\xi_{p_0}^\ast(r_2,\varphi_2,z) \\
+           \times& \left<\exp\left\{\mathrm{i}[\chi(r_1,\varphi_1,z)-\chi(r_2,\varphi_2,z)]\right\}\right> \\
+           \times& \xi_{p}^\ast(r_1,\varphi_1,z)\xi_{p}(r_2,\varphi_2,z){r_1}{r_2}\mathrm{d}r_1\mathrm{d}r_2\mathrm{d}\varphi_1\mathrm{d}\varphi_2,
+  \label{Eq6}
+ \end{split}
+\end{equation}
+\noindent 公式 \eqref{Eq6} 中的总体平均项可以被表示为\citeup{}
+\begin{equation}
+\begin{split} \left<\exp\{\mathrm{i}[\chi(r_1,\varphi_1,z)-\chi(r_2,\varphi_2,z)]\}\right>=\exp\left[-\frac{r_1^{2}+r_2^{2}-2{r_1}{r_2}\cos(\varphi_1-\varphi_2)}{\rho_0^{2}}\right]
+\label{Eq7}\cdot
+\end{split}
+\end{equation}
+\noindent 在公式 \eqref{Eq7} 中，$\rho_0$ 为球面波在 non-Kolmogorov 湍流中传播时的空间相干长度。 通过计算可以证明，$\theta$ 的改变不会影响到 $P(\xi,p|\xi,p_0)$ 的取值，也就是说，DSOS 的相对相位在湍流引起的相位浮动下不会对其检测概率产生影响。有研究表明，OAM 本征态在相位浮动的影响下会发生径向扩散\citeup{}，而下面表明在 DSOS 上也会有径向扩散。
 
-\begin{figure}[h]
-\subfigure[]{
-\label{picd}
-\includegraphics[width=6.77cm]{picd.pdf}}
-\subfigure[]{
-\label{pice}
-\includegraphics[width=7.04cm]{pice.pdf}}
-\caption{$2m\times 2m$的理想导体平板中心处感应电流$x$分量随时间的变化关系}
-\label{fig2}
-\end{figure}
+\section{数值计算及分析}
 
+这一小节的所有数值计算都是利用 Mathematica 软件给出的。图 \ref{Fig4_2.eps} 展示了几种 DSOS 检测概率的径向低阶项随 $\beta$ 的变化。可以清楚的看到，当径向指数 $p$ 分别为 1，2 时，$\ket{\xi,p}$ 的接收概率分别满足 $10\%\sim 100\%$ 和 $1\%\sim 10\%$。当 $p$=3 时，接收概率很小，大约在 $0.1\%$ 左右或者以下。根据扩散规律，更高阶的项的接收概率会更小。因此可以认为，接收到的态 $\ket{\xi}$ 几乎满足 $p$=0 或 1。另外在实际中已经有工作指出，DSOS 能够在实验中被检测到，但因为孔径有限，高阶项比低阶项更难被检测到\citeup{}。所以，有理由忽略高阶项并做如下近似：$P(\xi|\xi,p_0)\approx P(\xi,p=0|\xi,p_0)+P(\xi,p=1|\xi,p_0)$。当 $\beta=0$ 或者 $\pi$ 时，$P(\xi|\xi,p_0)$ 可以被写为 $P(n|n,p_0)$ 或者 $P(m|m,p_0)$。
 
-由于时域混合场积分方程是时域电场积分方程与时域磁场积分方程的线性组
-合，因此时域混合场积分方程时间步进算法的阻抗矩阵特征与时域电场积分方程
-时间步进算法的阻抗矩阵特征相同。
-\section{时域积分方程时间步进算法矩阵方程的求解}
+\pic[H]{探测概率 $P(\xi|\xi,p_0)$ 的径向低阶项随 $\beta$ 的变化。图中实线表示：$n$=0，$m$=1； 虚线表示：$n$=5，$m$=6；点划线表示：$n$=10，$m$=11。}{width=0.5\textwidth}{Fig4_2.eps}
 
-\begin{theorem}
-如果时域混合场积分方程是时域电场积分方程与时域磁场积分方程
-的线性组合。
-\end{theorem}
-\begin{proof}
-由于时域混合场积分方程是时域电场积分方程与时域磁场积分方程的线性组
-合，因此时域混合场积分方程时间步进算法的阻抗矩阵特征与时域电场积分方程
-时间步进算法的阻抗矩阵特征相同。
-\end{proof}
-\begin{corollary}
-时域积分方程方法的研究近几年发展迅速，在本文研究工作的基础上，仍有以下方向值得进一步研究。
-\end{corollary}
-\begin{lemma}
-因此时域混合场积分方程时间步进算法的阻抗矩阵特征与时域电场积分方程
-时间步进算法的阻抗矩阵特征相同。
-\end{lemma}
+\begin{pics}[H]{探测概率 $P(\xi|\xi,p_0)$ 随 $\beta$ 的变化。}{Fig4_3.eps}
+\addsubpic{ $\Delta l=|n-m|$=~1，~2，~3，~4，~5}{width=0.45\textwidth}{Fig4_3a.eps}
+\addsubpic{ $\Delta l=|n-m|=~1$}{width=0.45\textwidth}{Fig4_3b.eps}
+\addsubpic{  $m=-n$=~1，~2，~3。其他参数：$\mathrm{C}^2_n=10^{-15}\mathrm{m}^{3-\alpha}$，$\alpha$=3.67，$z$=5000 m, $\lambda$=1550 nm，$\omega_0$=0.03 m，$p_0$=0。}{width=0.45\textwidth}{Fig4_3c.eps}
+\end{pics}
+
+在下面的分析中，“隆起”一词表示向上凸的曲线。图 \ref{Fig4_3.eps}(a) 展示了 $P(\xi|\xi,p_0)$ 随 $\beta$ 的变化，这里 $\Delta l=|n-m|$ 取了几种不同的值。观察发现当 $\Delta l=~1$ 时，在 $0\sim3\pi/8$ 的区域内有一点小小的隆起，因此 $P(\xi|\xi,p_0)$ 在这一范围内有比相应的 $P(n|n,p_0)$ 和 $P(m|m,p_0)$ 更大的值。但是当 $\Delta l$ =~2，~3，~4，~5 时，没有隆起现象发生。图 \ref{Fig4_3.eps}(b) 展示了当 $\Delta l=|n-m|=~1$ 时几个 $P(\xi|\xi,p_0)$ 随 $\beta$ 的变化。可以清楚地看到，每个 $P(\xi|\xi,p_0)$ 的曲线上都有隆起，并且当 $n$ 和 $m$ 增加时，隆起现象变得更加明显了。另外，当 $n$ 和 $m$ 增加时，隆起的曲线变得更加对称。图 \ref{Fig4_3.eps}(c) 展示了一种重要情形下的探测概率：$n$=$-m$。 观察发现，除了当 $-n$=$m$=1 时有极其微小的隆起之外，其他情况下看不到隆起。这里可以推测，隆起现象可能和 $\Delta l$ 的大小有关。
+
+图 \ref{Fig4_3.eps}(a)-(c) 说明了明显的隆起现象只出现在两个 OAM 量子数相邻的 DSOS (ADSOS) 上，而未出现在其他的 DSOS 上。这一原因会在以下的分析中得到解释。令 $a=\mathrm{cos}\left(\beta/2\right)$, $b=\mathrm{sin}\left(\beta/2\right)$, $u_{j,l}^\mathrm{LG}(r,\varphi,z)=LG_{j}^\mathrm{l}(r,z)\exp{(\mathrm{i}l\varphi)/\sqrt{2}}$，这里有 $l=n,m$， $j=p,p_0$. 首先定义
+\begin{equation}
+  \begin{split}
+s^{i_{1},i_{2},i_{3},i_{4}}_{h}=&\left[LG_{p}^\mathrm{i_{1}}(r_{1},z)\right]^{\ast}LG_{p}^\mathrm{i_{2}}(r_{2},z)\left[LG_{p_0}^\mathrm{i_{3}}(r_{2},z)\right]^{\ast}LG_{p_0}^\mathrm{i_{4}}(r_{1},z)\\
+      \times &I_{h}\left(2r_{1}r_{2}/\rho^2_0\right)\exp\left(-\frac{r_{1}^2+r_{2}^2}{\rho^2_0}\right)
+  \label{A3}
+ \end{split}
+\end{equation}
+由文献 \cite{Zhu2015} 中可得到恒等式
+\begin{equation}
+  \begin{split}
+\int_0^{2\pi}\exp{\left[-\mathrm{i}n\varphi_{1}+\eta\mathrm{cos}\left(\varphi_{1}-\varphi_{2}\right)\right]}d\varphi_{1}=2\pi\exp{\left(-\mathrm{i}n\varphi_{2}\right)}I_{n}\left(\eta\right)
+ \label{A1}
+ \end{split}
+\end{equation}
+\noindent 这里 $I_{n}(\ast)$ 是第一类 $n$ 阶修正贝塞尔函数。由公式 \eqref{A1} 可得到 $P(\xi|\xi,p_0)$ 的 $p$ 阶项为
+\begin{equation}
+  \begin{split}
+P(\xi,p|\xi,p_0)=&\int_0^{\infty}\int_0^{\infty}(a^{4}s^{n,n,n,n}_{0}+b^{4}s^{m,m,m,m}_{0}\\
+                +&a^{2}b^{2}s^{n,m,m,n}_{0}+a^{2}b^{2}s^{m,n,n,m}_{0}\\
++&a^{2}b^{2}s^{m,m,n,n}_{n-m}+a^{2}b^{2}s^{n,n,m,m}_{m-n})r_{1}r_{2}dr_{1}dr_{2}
+ \label{A2}
+ \end{split}
+\end{equation}
+\noindent 这里 $s^{\ast,\ast,\ast,\ast}_{\ast}$ 的定义是
+
+\noindent 本征态 $\ket{l_{2},p_0}$ 转变成 $\ket{l_{1},p}$ 的概率为 \cite{Giovannini2011}
+\begin{equation}
+  \begin{split}
+P(l_{1},p|l_{2},p_0)=\int_0^{\infty}\int_0^{\infty}s^{l_{1},l_{1},l_{2},l_{2}}_{l_{2}-l_{1}}r_{1}r_{2}dr_{1}dr_{2}
+  \label{A4}
+ \end{split}
+\end{equation}
+\noindent 令
+\begin{equation}
+  \begin{split}
+F_{p_0}^p=&\int_0^{\infty}\int_0^{\infty}(a^{4}s^{n,n,n,n}_{0}+b^{4}s^{m,m,m,m}_{0}+a^{2}b^{2}s^{m,n,n,m}_{0}\\
+   +&a^{2}b^{2}s^{n,m,m,n}_{0})r_{1}r_{2}dr_{1}dr_{2}
+\label{A5}
+ \end{split}
+\end{equation}
+\begin{equation}
+  \begin{split}
+R_{p_0}^p=a^{2}b^{2}[P(n,p|m,p_0)+P(m,p|n,p_0)]
+ \label{A6}
+ \end{split}
+\end{equation}
+\noindent 这里 $P(\xi,p|\xi,p_0)$ 可以表示为
+\begin{equation}
+  \begin{split}
+P(\xi,p|\xi,p_0)=F_{p_0}^p+R_{p_0}^p
+ \label{A7}
+ \end{split}
+\end{equation}
+\noindent 探测概率 $P(\xi|\xi,p_0)$ 可以被估计为 $F+R$，这里有 $F\approx F_{0}^0+F_{0}^1$ 和 $R\approx R_{0}^0+R_{0}^1$ 或者 $R\approx \mathrm{cos}^2\left(\beta/2\right)\mathrm{sin}^2\left(\beta/2\right)[P(n|m,p_0=0)+P(m|n,p_0=0)]$。
+
+可以很容易的知道，$\mathrm{cos}^2\left(\beta/2\right)\mathrm{sin}^2\left(\beta/2\right)$ 随 $\beta$ 的变化曲线是一条隆起的曲线，因此 $R$ 可以表示很多条隆起的曲线，并且隆起的程度取决于 $P(n|m,p_0=0)+P(m|n,p_0=0)$。 这里$P(n|m,p_0=0)$ 和 $P(m|n,p_0=0)$ 分别表示 OAM 量子数 $m$ and $n$ 互相变成对方的概率，而这类概率已经在以前的工作中得到了深入的研究\citeup{Paterson2005,Zhu2015}。
+
+\begin{pics}[H]{F 和 R 随 $\beta$ 的变化。}{Fig4_4.eps}
+\addsubpic{ F 项随 $\beta$ 的变化}{width=0.45\textwidth}{Fig4_4a.eps}
+\addsubpic{ R 项随 $\beta$ 的变化。在 (a) 和 (b) 中有 $|n-m|$=~1，~2，~3。其他参数：$\mathrm{C}^2_n=10^{-15}\mathrm{m}^{3-\alpha}$，$\alpha$=3.67，$z$=5000 m，$\lambda$=1550 nm，$\omega_0$=0.03 m，以及 $p_0$=0。}{width=0.45\textwidth}{Fig4_4b.eps}
+\end{pics}
+
+图 \ref{Fig4_4.eps} 展示了 $F$ 和 $R$ 随 $\beta$ 的变化，这里 $\Delta l=~1,~2,~3$。在 $F$ 的曲线上没有隆起现象发生，而在 $R$ 的曲线上出现了一个对称的隆起。当 $\Delta l$ 减小时, $F$ 的曲线变得倾斜, 而 $R$ 上的隆起变得明显。当 $\Delta l=~2,~3$ 时 $R$ 上的隆起很小，这是因为 $P(n|m,p_0=0)+P(m|n,p_0=0)$ 很小。这可以解释为什么图 \ref{Fig4_3.eps}(a) 中当 $\Delta l=~2, ~3$ 时 DSOSs 的探测概率中没有隆起现象。
+
+为了用例子说明这一分析的普适性，这里展示了在几种湍流环境中 ADSOS 的 $F$ 和 $R$ 随 $\beta$ 的变化，如图 \ref{Fig4_5.eps} 所示。在图 \ref{Fig4_5.eps} (a)，(c)，(e) 中可以看到 $F$ 上仍然没有隆起现象。另外，当 $n$ 和 $m$ 增加时 $F$ 的曲线变得更加平坦。在图 \ref{Fig4_5.eps} (b)，(d) 和 (f) 中 $R$ 的曲线仍然有对称的隆起。当 $n$ 和 $m$ 增加时, $R$ 上的隆起变得更加明显。这能够解释为什么如 \ref{Fig4_3.eps}(b) 中所展示那样，探测概率曲线上的隆起随着 $n$ 和 $m$ 的增加而变得明显。
+
+图 \ref{Fig4_4.eps} 和图 \ref{Fig4_5.eps} 说明了在去掉 $R$ 项只有 $F$ 项的情形下，DSOS 探测概率就不会展现出隆起现象。隆起的出现需要足够大的 $P(n|m,p_0=0)+P(m|n,p_0=0)$，使得 $R$ 项上有一个足够的隆起叠加在 $F$ 上。 可以说，$P(n|m,p_0=0)+P(m|n,p_0=0)$ 是隆起的控制参数。当$P(n|m,p_0=0)+P(m|n,p_0=0)$ 很小时，探测概率曲线上的隆起很小甚至消失；当$P(n|m,p_0=0)+P(m|n,p_0=0)$ 变大时，探测概率曲线上的隆起可能出现或者变得明显。如果 DSOS 的探测概率出现了隆起，我们可以认为 DSOS 中的两个部分共同产生了\emph{协同效应}。
+
+\begin{pics}[H]{ F 项与 R 项随 $\beta$ 的变化。}{Fig4_5.eps}
+\addsubpic{ F 项随 $\beta$ 的变化，$\mathrm{C}^2_n=10^{-15}\mathrm{m}^{3-\alpha}$，$\alpha$=3.67}{width=0.4\textwidth}{Fig4_5a.eps}
+\addsubpic{ R 项随 $\beta$ 的变化，$\mathrm{C}^2_n=10^{-15}\mathrm{m}^{3-\alpha}$，$\alpha$=3.67}{width=0.4\textwidth}{Fig4_5b.eps}
+\addsubpic{ F 项随 $\beta$ 的变化，$\mathrm{C}^2_n=5\times 10^{-16}\mathrm{m}^{3-\alpha}$，$\alpha$=3.67}{width=0.4\textwidth}{Fig4_5c.eps}
+\addsubpic{ R 项随 $\beta$ 的变化，$\mathrm{C}^2_n=5\times 10^{-16}\mathrm{m}^{3-\alpha}$，$\alpha$=3.67}{width=0.4\textwidth}{Fig4_5d.eps}
+\addsubpic{ F 项随 $\beta$ 的变化，$\mathrm{C}^2_n=10^{-15}\mathrm{m}^{3-\alpha}$，$\alpha$=3.37}{width=0.4\textwidth}{Fig4_5e.eps}
+\addsubpic{ R 项随 $\beta$ 的变化，$\mathrm{C}^2_n=10^{-15}\mathrm{m}^{3-\alpha}$，$\alpha$=3.37。其他参数：$z$=5000 m，$\lambda$=1550 nm，$\omega_0$=0.03 m，以及 $p_0$=0。}{width=0.4\textwidth}{Fig4_5f.eps}
+\end{pics}
+
+\begin{pics}[H]{ 探测概率 $P(\xi|\xi,p_0)$ 的隆起现象在大气湍流中的演化过程。}{Fig4_6.eps}
+\addsubpic{ $n$=0，$m$=1}{width=0.46\textwidth}{Fig4_6a.eps}
+\addsubpic{  $n$=5，$m$=6}{width=0.46\textwidth}{Fig4_6b.eps}
+\addsubpic{ $n$=10，$m$=11。其他参数：$\lambda$=1550 nm，$\omega_0$=0.03 m， $\mathrm{C}^2_n=10^{-14}\mathrm{m}^{3-\alpha}$，$\alpha$=3.97。}{width=0.46\textwidth}{Fig4_6c.eps}
+\end{pics}
+
+为了研究大气湍流在涡旋光束的传播过程中对探测概率的隆起现象有什么影响，这里考虑了几个例子，如图 \ref{Fig4_6.eps} 所示。在图 \ref{Fig4_6.eps}(a) 中，隆起现象随着 $z$ 的增加而变得更明显。在图 \ref{Fig4_6.eps}(b) 和图 \ref{Fig4_6.eps}(c) 中，随着 $z$ 的增加，隆起现象先逐渐变得明显然后逐渐变得微弱。这一现象可以通过上面的分析得到解释。当 $n$=0 以及 $m$=1 时， $z$ 从 0 增加到 3km 的过程中 $P(n=0|m=1, p_0=0)$ 和 $P(m=1|n=0, p_0=0)$ 逐渐变大，因此隆起现象变得明显。当 $n$ 和 $m$ 较大时，随着 $z$ 的增加 $P(n=0|m=1, p_0=0)$ 和 $P(m=1|n=0, p_0=0)$ 先增大后减小，因此隆起现象先变得明显在逐渐减弱。
+
+图 \ref{Fig4_7sup.eps} 中展现了初始 OAM 态检测概率上的隆起随束宽 $\omega_0$ 的变化。图 \ref{Fig4_7sup.eps}(a)-(d) 分别展现了四种不同湍流条件下的情形。从图 \ref{Fig4_7sup.eps}(a)-(d) 中可以发现，当束宽 $\omega_0$ 在 55mm 左右时，$P(\xi|\xi,p_0)$ 整体达到最大。另外图 \ref{Fig4_7sup.eps}(a)-(d)似乎说明，检测概率上的隆起对束宽的变化不太敏感，但是在 $\omega_0$=55mm 附近隆起要稍微明显一些。
+
+\begin{pics}[H]{ 探测概率 $P(\xi|\xi,p_0)$  随 $\omega_0$ 及 $\beta$ 的变化。}{Fig4_7sup.eps}
+\addsubpic{$\mathrm{C}^2_n=10^{-15}\mathrm{m}^{3-\alpha}$，$\alpha$=3.67}{width=0.46\textwidth}{Fig4_7supa.eps}
+\addsubpic{$\mathrm{C}^2_n=10^{-14}\mathrm{m}^{3-\alpha}$，$\alpha$=3.67}{width=0.46\textwidth}{Fig4_7supb.eps}
+\addsubpic{$\mathrm{C}^2_n=10^{-15}\mathrm{m}^{3-\alpha}$，$\alpha$=3.97}{width=0.46\textwidth}{Fig4_7supc.eps}
+\addsubpic{$\mathrm{C}^2_n=10^{-14}\mathrm{m}^{3-\alpha}$，$\alpha$=3.97。其他参数：$p=p_0=0$，$n$=10，$m$=11，$\lambda$=1550nm，$z$=3000m。}{width=0.46\textwidth}{Fig4_7supd.eps}
+\end{pics}
+
+\begin{pics}[H]{ $\ket{\xi}$ 转化为 $\ket{\zeta}$ 的概率 $P(\zeta|\xi,p_0)$ 随 $\beta$ 的变化。}{Fig4_6sup.eps}
+\addsubpic{ $\mathrm{C}^2_n=10^{-15}\mathrm{m}^{3-\alpha}$，$\alpha$=3.67}{width=0.45\textwidth}{Fig4_6supa.eps}
+\addsubpic{ $\mathrm{C}^2_n=5\times 10^{-15}\mathrm{m}^{3-\alpha}$，$\alpha$=3.67}{width=0.45\textwidth}{Fig4_6supb.eps}
+\addsubpic{ $\mathrm{C}^2_n=10^{-16}\mathrm{m}^{3-\alpha}$，$\alpha$=3.67}{width=0.45\textwidth}{Fig4_6supc.eps}
+\addsubpic{ $\mathrm{C}^2_n=10^{-15}\mathrm{m}^{3-\alpha}$，$\alpha$=3.07}{width=0.45\textwidth}{Fig4_6supd.eps}
+\addsubpic{ $\mathrm{C}^2_n=10^{-15}\mathrm{m}^{3-\alpha}$，$\alpha$=3.37}{width=0.45\textwidth}{Fig4_6supe.eps}
+\addsubpic{ $\mathrm{C}^2_n=10^{-15}\mathrm{m}^{3-\alpha}$，$\alpha$=3.97。其他参数：$z$=5000 m，$\lambda$=1550 nm，$\omega_0$=0.03 m，以及 $p_0$=0。}{width=0.45\textwidth}{Fig4_6supf.eps}
+\end{pics}
+
+图 \ref{Fig4_6sup.eps} 展示了在不同的湍流下初始态 $\ket{\xi}$ 变成对径态 $\ket{\zeta}$ 的概率。从图 \ref{Fig4_6sup.eps}(a)-(f) 中可以看到，对于几对 OAM 量子数的 $\ket{\xi}$，变成 $\ket{\zeta}$ 的概率在 $\beta=\pi/2$ 附近达到最小。在图 \ref{Fig4_6sup.eps}(b) 和 (f) 中，量子数越大，变成 $\ket{\zeta}$ 的概率几乎越大，而在图 \ref{Fig4_6sup.eps}(a)、(c)、(d) 和 (e) 中是相反的。原因是在图 \ref{Fig4_6sup.eps}(b) 和 (f) 中的相位浮动较强，量子数大的 $\ket{\xi}$ 变成 $\ket{\zeta}$ 的概率在 0-3 km 先上升后下降，而量子数较小时的这一概率一直上升，因此它可以比量子数较大时的概率大。在图 \ref{Fig4_6sup.eps}(a)、(c)、(d) 和 (e) 中相位浮动较弱，因此无论量子数是大是小，变成 $\ket{\zeta}$ 的概率在 0-3 km 范围内随着 $z$ 的增加一直上升，这时量子数较大时变成 $\ket{\zeta}$ 的概率也较大。
+
+\begin{pics}[H]{信道容量 $C$ 随 $\beta$ 和 $z$ 的变化。}{Fig4_7.eps}
+\addsubpic{ 信道容量 $C$ 随 $\beta$ 的变化，这里有 $\Delta l=|n-m|=1$ 并且 $z$=5000m}{width=0.45\textwidth}{Fig4_7a.eps}
+\addsubpic{ 信道容量 $C$ 随传播距离 $z$ 的变化，这里 $\beta$，$n$ 和 $m$ 取不同的值。其他参数：$\mathrm{C}^2_n=10^{-15}\mathrm{m}^{3-\alpha}$，$\alpha$=3.67，$\lambda$=1550nm，$p_0$=0，$\omega_0$=0.03m。}{width=0.45\textwidth}{Fig4_7b.eps}
+\end{pics}
+
+为了了解协同效应的实际用途，这里探讨了通信系统中一个重要的概念：信道容量。按照香农的定义，信道容量可以表示为：$C=\mathrm{max}\left[H(x)-H(x|y)\right]$，$H(x)$ 表示信源熵并有 $H(x)=-\sum_{i}P(x_i)\log P(x_i)$， $H(x|y)$ 表示条件熵并且有 $H(x|y)= -\sum_{i}\sum_{j}P(x_i,y_j)\log P(x_i|y_j)$ \citeup{Shannon1948}. $P(x_i,y_j)$ 表示 $x_i$ 和 $y_i$ 的联合概率。
+
+这里假设信道容量仅仅基于两个 OAM 态：$\ket{\xi}$ 和 $\ket{\zeta}$，并且所涉及概率都用两个低阶径向项的和来估计。当 $P(x_i)=1/2$ 时，信源熵取得最大值。图 \ref{Fig4_7.eps}(a) 展示了在同一湍流环境中信道容量 $C$ 随 $\beta$ 的变化。可以看到每个 $C$ 的曲线上都表现出对称的隆起。另外可以看到当 $n$ 和 $m$ 增大时 $C$ 减小。图 \ref{Fig4_7.eps}(b) 展示了 $C$ 在通信信道中的变化。随着 $z$ 的增加，当 $n$ 和 $m$ 较大时，$C$ 下降得比较快。由于协同效应，在 $\beta$=$\pi$/2 时的信道容量比 $\beta$=0 和 $\pi$ 时的更大。 协同效应在信道容量中的反映有利于对高维 OAM 态进行大气通信的研究。
 
 \section{本章小结}
-本章首先研究了时域积分方程时间步进算法的阻抗元素精确计算技术，分别
-采用DUFFY 变换法与卷积积分精度计算法计算时域阻抗元素，通过算例验证了计
-算方法的高精度。
 
-\chapter{全文总结与展望}
+本章研究了 DSOS 在弱 non-Kolmogorov 湍流中传播时的 OAM 扩散，并揭示了 DSOS 上的协同效应。数值计算表明，当 DSOS 的两个 OAM 量子数互相转化的概率足够大时，协同效应就会产生。在弱 non-Kolmogorov 湍流中，当这两个 OAM 量子数相邻时，它们互相转化的概率就会很大，因此在 ADSOS 上就很有可能产生协同效应。协同效应能够增大 DSOS 的探测概率并进而扩大基于 DSOS 的信道容量。虽然本章的研究是基于 LG 模，但是本章的分析方法也适用于其他类型的 OAM 模。另外，本章中还有两个重要结论。一、协同效应只在一定的传播距离上发挥明显作用。当传播距离过大或者过小时，协同效应会明显变弱。二、在弱大气湍流中，DSOS 的相对相位不会明显影响到其探测概率。本章的结论有助于开展基于高维 OAM 叠加态的大气通信的研究。
 
-\section{全文总结}
-本文以时域积分方程方法为研究背景，主要对求解时域积分方程的时间步进算法以及两层平面波快速算法进行了研究。
+% !Mode:: "TeX:UTF-8"
 
-\section{后续工作展望}
-时域积分方程方法的研究近几年发展迅速，在本文研究工作的基础上，仍有以下方向值得进一步研究：
+\chapter{基于叠加 LG 模的泵浦光源所产生的纠缠光子对在 non-Kolmogorov 湍流中的 OAM 扩散}
+
+量子纠缠在物理学中是一种十分神秘且违反直觉的物理现象，这一现象在近几十年以来不断的被实验所证实。它在许多应用中比如量子密码学、量子隐形传态以及量子计算中扮演着十分重要的角色。一般来说，制备纠缠光子对的方法叫做自发参数下转换（spontaneous parametric down-conversion，SPDC）。 在这一方法中，将一束光照射到一块很薄的非线性晶体上，出射面会产生两类光子：信号光子 (signal photons) 和空闲光子 (idler photons),如图 \ref{Fig5_1.eps} 所示。这两类光子能够在极化域、时间-能量域以及 OAM 域中产生纠缠 \citeup{}。现在，OAM 纠缠光子对在信息领域的应用是一个研究热点，主要是因为 OAM 能够提供可观的空间进行编码。在许多工作中，由单一 OAM 模式的泵浦光源制备的纠缠光子对得到了深入研究，但对基于叠加模式泵浦光源的纠缠光子对的研究相对较少。
+
+目前在一些文献中研究了大气湍流对 OAM 纠缠光子对带来的影响，因为它们在大气通信中具有潜在的应用价值\citeup{}。 但是，正如单光子那样，大气湍流带来的扰动也会降低纠缠光子对 OAM 态的探测概率。另外，大气湍流也带来了 OAM 纠缠的衰退。不过与单光子相比，一些低阶 OAM 的纠缠光子具有更好的鲁棒性，可以被用来减轻通信串扰。
+
+\pic[H]{利用 SPDC 产生纠缠光子对的示意图。}{width=0.75\textwidth}{Fig5_1.eps}
+
+在前面的章节里主要讨论了单光子（即不纠缠的情形）在大气湍流中所表现出的特性，而在这一章里主要研究纠缠情形下 OAM 态在 non-Kolmogorov 湍流中的探测概率和 OAM 扩散。在以下的讨论中除了假定泵浦光源为叠加模式外，对纠缠光子 OAM 态的检测也是在一个二维空间里进行，即所检测的态为一个二维 OAM 叠加态。为了方便起见，在数值分析的部分假设了径向指数有如下关系：$p=p_0$。
+
+\section{信号光子在 non-Kolmogorov 湍流中的检测概率}
+
+假设通过 I 型 SPDC 产生纠缠光子对，让信号光子通过 non-Kolmogorov 湍流，并让空闲光子通过没有扰动的自由空间。假设泵浦光源由波长为 632.8 nm 的 He-Ne 激光器搭建。根据能量守恒定理，这里有 $\omega_p=2\omega_i=2\omega_s$，其中 $\omega_p$ 表示泵浦光源的频率，$\omega_i$ 表示空闲光子的频率，$\omega_s$ 表示信号光子的频率。当晶体足够薄时，纠缠光子对的 OAM 波函数可以表示为\citeup{}：
+\begin{equation}
+\ket{\Phi}=\iint dr_{\perp}dr'_\perp\xi_{p_0}(r_\perp)\delta(r_\perp-r'_\perp)\hat{a}^\dag_s(r_\perp)\hat{a}^\dag_i(r'_\perp)\ket{0,0}
+ \label{entangled_state}
+\end{equation}
+\noindent 这里 $\xi_{p_0}(r_\perp)$ 表示在晶体的入射面上泵浦光源的场分布函数。$\hat{a}^\dag_s(r_\perp)$ 和 $\hat{a}^\dag_i(r'_\perp)$ 分别表示信号光子和空闲光子的产生算符。$\ket{0,0}$ 表示真空态。为了讨论方便，假设组成泵浦光源的 LG 模的光束半径、波长和径向指数是相同的，并假设晶体的位置为 $z$=0，则泵浦光源的复振幅函数为 \citeup{}
+\begin{equation}
+\xi_{p_0}(r,\varphi)=\sum_{n=1}^{N}a_{n}LG_{p_0}^{l_0}(r,\varphi)=\sum_{n=1}^{N}a_{n}R_{p_0}^{l_0}(r)\frac{\exp(\mathrm{i}l\varphi)}{\sqrt{2\pi}}
+ \label{pump_function}
+\end{equation}
+\noindent 这里 $p_0$ 表示泵浦光源的 LG 模的径向指数，$l_0$ 表示泵浦光源各 LG 模的 OAM 量子数，$R_{p_0}^{l_0}(r)$ 表示 LG 模在 $z=~0$ 处的径向部分。叠加系数 $a_1,a_2,...,a_N$ 满足 $\sum_{n=1}^{N}|a_{n}|^2=~1$。假设信号光子和空闲光子的模函数的束腰在 $z=~0$ 处，则空闲光子的 OAM 态可以表示为 \citeup{}
+\begin{equation}
+\ket{m,p_1}=\int dr_{\perp}LG_{p_1}^{m}(r_\perp,z)\hat{a}^\dag_i(r_\perp,z)\ket{0}
+ \label{idler_state}
+\end{equation}
+\noindent 信号光子在投影在 N 维希尔伯特空间里的 OAM 态可以表示为\citeup{}
+ \begin{equation}
+\ket{\zeta_j,p_2}=\int dr'_{\perp}\zeta_{p_2}^{(j)}(r'_\perp,z)\hat{a}^\dag_s(r'_\perp,z)\ket{0}\qquad(j=1,2,...,n)
+ \label{sugnal_state}
+\end{equation}
+\noindent 这里
+ \begin{equation}
+\zeta_{p_2}^{(j)}(r'_\perp,z)=\sum_{n=1}b_n^{(j)}R_{p}^{l_n}(r',z)\frac{\exp(\mathrm{i}l\varphi)}{\sqrt{2\pi}}
+ \label{sugnal_state1}
+\end{equation}
+\noindent 这里 $R_{p}^{l_n}(r',z)$ 为 LG 模在 $z$ 处的径向分量。$b_n^{(j)}$ 为叠加系数。可以从数学上证明，存在一组系数 $A_1,A_2,...,A_{N-1},A_{N}$，受到湍流影响后光子对的 OAM 态为
+ \begin{equation}
+ \begin{split}
+\ket{\Phi}=& \hat{T}\ket{\Phi}\\
+          =&\sum_{m}\sum_{l}\sum_{p_1}\sum_{p_2}C_{m,l}^{p_1,p_2}\ket{m,p_1}\ket{l,p_2}\\
+          =&\sum_{m}\sum_{p_1}\sum_{p_2}C_{m}^{p_1,p_2}\ket{m,p_1}\left(\sum_{j=1}^{N}A_j\ket{\zeta_j,p_2}\right)\\
+          &+\sum_{m}\sum_{l\neq{l_n}}\sum_{p_1}\sum_{p_2}C_{m,l}^{p_1,p_2}\ket{m,p_1}\ket{l,p_2}\\
+          =&\sum_{m}\sum_{p_1}\sum_{p_2}\sum_{j=1}^{N}B_{m,p_1,p_2}^{(j)}\ket{m,p_1}\ket{\zeta_j,p_2}\\
+          &+\sum_{m}\sum_{l\neq{l_n}}\sum_{p_1}\sum_{p_2}C_{m,l}^{p_1,p_2}\ket{m,p_1}\ket{l,p_2}
+ \label{disturb_pair_state}
+ \end{split}
+\end{equation}
+\noindent 这里有 $B_{m,p_1,p_2}^{(j)}=C_{m}^{p_1,p_2}\times{A_j}$，$\hat{T}$ 表示湍流算子。$\ket{\zeta_1,p_2},\ket{\zeta_1,p_2},...,\ket{\zeta_N,p_2}$ 彼此正交并且能够表示任意的态 $\ket{l_n,p_2}$。 在弱湍流区域中强度起伏可以忽略并且 $\hat{T}$ 对应于相位起伏项 $\exp\left[\mathrm{i}\chi(r,\varphi,z)\right]$，这里 $\chi(r,\varphi,z)$ 是随机变量。通过公式 \eqref{disturb_pair_state}，可计算出系数 $B_{m,p_1,p_2}^{(j)}$ 的值
+ \begin{equation}
+ \begin{split}
+B_{m,p_1,p_2}^{(j)}=&\langle{m,p_1}|\langle{\xi,p_0}|\Psi\rangle=\langle{m,p_1}|\langle{\xi,p_0}|\hat{T}\ket{\Phi}\\
+=&\iint\xi_{p_0}(r_\perp)\delta(r_\perp-r'_\perp)\left[LG_{p_1}^{m}(r_\perp,z)\right]^\ast\left[\zeta_{p_2}^{(j)}(r'_\perp,z)\right]^\ast\\
+ &\times\exp\left[\mathrm{i}\chi(r'_\perp,z)\right]dr_{\perp}dr'_\perp\\
+=&\int_0^{2\pi}\int_0^{\infty}\xi_{p_0}(r,\varphi)\left[LG_{p_1}^{m}(r,\varphi,z)\right]^\ast\left[\zeta_{p_2}^{(j)}(r,\varphi,z)\right]^\ast\\
+ &\times\exp\left[\mathrm{i}\chi(r,\varphi,z)\right]rdrd\varphi
+ \label{amplitude}
+ \end{split}
+\end{equation}
+\noindent 由于大气湍流对信号光子的波函数造成的扰动是随机的，因此其 OAM 模的检测概率也是随机的。这里我们考察检测概率的统计特性。信号光子经过湍流后为 $\ket{\zeta_j}$ 态的概率为
+ \begin{equation}
+ \begin{split}
+P(\zeta_j)=& \left\langle\sum_{m,p_1,p_2}\left|B_{m,p_1,p_2}^{(j)}\right|^2\right\rangle\\
+=&\sum_{m,p_2}\int_0^{2\pi}\int_0^{2\pi}\int_0^{\infty}\xi_{p_0}(r,\varphi_1)\left[\xi_{p_0}(r,\varphi_2)\right]^\ast\\
+&\times\frac{\exp\left[-\mathrm{i}m(\varphi_1-\varphi_2)\right]}{\sqrt{2\pi}}\times\left[\zeta_{p_2}^{(j)}(r,\varphi_1,z)\right]^\ast\zeta_{p_2}^{(j)}(r,\varphi_2,z)\\
+&\times\left\langle\exp\left\{\mathrm{i}\left[\chi(r,\varphi_1,z)+\chi^\ast(r,\varphi_2,z)\right]\right\}\right\rangle rdrd\varphi_{1}d\varphi_2
+ \label{S_probability}
+ \end{split}
+\end{equation}
+\noindent 这里 $\langle\cdot\rangle$ 表示总体平均。为了简化讨论，令 $m=~0$，$p_2=p_0=~0$，则
+  \begin{equation}
+ \begin{split}
+P(\zeta_j)\propto&\hat{P}(\zeta_j)=\int_0^{2\pi}\int_0^{2\pi}\int_0^{\infty}\xi_{0}(r,\varphi_1)\left[\xi_{p_0}(r,\varphi_2)\right]^\ast\\
+&\times\left[\zeta_{0}^{(j)}(r,\varphi_1,z)\right]^\ast\zeta_{0}^{(j)}(r,\varphi_2,z)\\
+&\times\left\langle\exp\left\{\mathrm{i}\left[\chi(r,\varphi_1,z)+\chi^\ast(r,\varphi_2,z)\right]\right\}\right\rangle rdrd\varphi_{1}d\varphi_2
+ \label{S_probability1}
+ \end{split}
+\end{equation}
+\noindent 因为 $\{\zeta_j\}_{j=1}^{N}$ 和 $\{l_n\}_{n=1}^{N}$ 都是 N 维希尔伯特空间中的完备正交基，因此通过正交矩阵的性质可以得到
+  \begin{equation}
+ \begin{split}
+\sum_{j=1}^N\hat{P}(\zeta_j)=\sum_{n=1}^N\hat{P}(l_n)
+ \label{Equ}
+ \end{split}
+\end{equation}
+\noindent 则信号光子的归一化检测概率为
+ \begin{equation}
+ \begin{split}
+\hat{\~{P}}(\zeta_j)=\frac{\hat{P}(\zeta_j)}{\sum_{l\neq{1_n}}\hat{P}(l)+\sum_{j=1}^N\hat{P}(\zeta_j)}=\frac{\hat{P}(\zeta_j)}{\sum_{l}\hat{P}(l)}
+ \label{NODP}
+ \end{split}
+\end{equation}
+
+\section{数值计算及分析}
+在这一小节里，主要讨论二维情形下 OAM 态经过 non-Kolmogorov 湍流后的归一化检测概率。首先将信号光子的二维 OAM 叠加态表示为如下形式
+ \begin{equation}
+ \begin{split}
+\begin{bmatrix} \zeta_{p}^{(1)}(r,\varphi,z) \\ \zeta_{p}^{(2)}(r,\varphi,z) \end{bmatrix}=\begin{bmatrix} b_{1}^{(1)} & b_{2}^{(1)} \\b_{2}^{(1)\ast} & b_{1}^{(1)\ast} \end{bmatrix}\begin{bmatrix} LG_{p}^{(1)}(r,\varphi,z) \\ LG_{p}^{(2)}(r,\varphi,z) \end{bmatrix}
+ \label{DSOS}
+ \end{split}
+\end{equation}
+\noindent 公式 \eqref{DSOS} 中的叠加系数可以被写为两部分：权重和相对相位。在下面的讨论中，$b_1^{(1)}$ 分别$b_2^{(1)}$ 被写为 $b_1^{(1)}=\mathrm{cos}(\theta_{i}/2)$ 和 $b_2^{(1)}=\exp{(\mathrm{i}\beta)}\mathrm{sin}(\theta_{i}/2)$。令 $\xi_{0}(r,\varphi)$ 为 $\zeta_{p}^{(1)}(r,\varphi,z)$ 在 $z=0$ 处的分布，则 $\ket{\zeta_2}$ 的归一化检测概率 $P(\zeta_2)$ 可以通过公式 \eqref{S_probability1} 得到
+  \begin{equation}
+ \begin{split}
+P(\zeta_2)\propto&\hat{P}(\zeta_2)=\int_0^{\infty}\left|R_0^{n}(r)\left[R_0^{n}(r,0)\right]^\ast-R_0^{m}(r)\left[R_0^{m}(r,0)\right]^\ast\right|^{2}dr
+ \label{S_probability2}
+ \end{split}
+\end{equation}
+\noindent 公式 \eqref{S_probability2} 蕴含了除 $n=-m$ 的情形外有 $P(\zeta_2)\neq 0$。下文重点讨论研究者们特别关注 $n=-m$ 的情形。
+
+图 \ref{Fig5_2.eps} 展示了不同 OAM 量子数下二维 OAM 叠加态的归一化检测概率。在图 \ref{Fig5_2.eps}(a)-(d)中我们可以看到，检测概率随 $\theta_p$ 和 $\theta_i$ 的变化而变化。在图 \ref{Fig5_2.eps}(a)-(b) 所展示的 $n=-m$ 情形下，如果 $\theta_p$ 或者 $\theta_i$ 的值固定，归一化检测概率的最大值能够在 $\theta_p=\theta_i$ 时得到。当然，这一结果同样适用于泵浦光源为单一 LG 模的情形。当 $\theta_p=\theta_i$，归一化检测概率的最大值在 $\theta_p=\theta_i=\pi/2$ 时获得，并且当 $\theta_p$ 或 $\theta_i$ 向两边减少时，概率减小。比较图 \ref{Fig5_2.eps}(a) 和图 \ref{Fig5_2.eps}(b) 可知当 $n=-m$ 时，OAM 量子数绝对值越大，检测概率在$\theta_p=\theta_i$ 时的分布越均匀。在图 \ref{Fig5_2.eps}(c)-(d) 中，我考虑了 $n\neq -m$ 的情形。我们可以看到，检测概率的分布并不像 $n=-m$ 时那样对称。
+
+\begin{pics}[H]{信号光子的 $\hat{\~{P}}(\zeta_1)$ 随 $\theta_i$ 和 $\theta_p$ 的变化。}{Fig5_2.eps}
+\addsubpic{ $n=~-1$，$m=~1$}{width=0.48\textwidth}{Fig5_2a.eps}
+\addsubpic{ $n=~-2$，$m=~2$}{width=0.48\textwidth}{Fig5_2b.eps}
+\addsubpic{ $n=~0$，$m=~1$}{width=0.48\textwidth}{Fig5_2c.eps}
+\addsubpic{ $n=~0$，$m=~2$。其他参数：$\mathrm{C}^2_n=10^{-14}\mathrm{m}^{3-\alpha}$，$\alpha=~3.67$，$z=~3000$ m，$\omega_p=~0.05$ m，$\omega_i=~0.01$ m，以及 $\beta_i=\beta_p=~0$。}{width=0.48\textwidth}{Fig5_2d.eps}
+\end{pics}
+
+\begin{pics}[H]{信号光子的 $\hat{\~{P}}(\zeta_1)$ 随 $\theta_i$ 和 $\theta_p$ 的变化。}{Fig5_3.eps}
+\addsubpic{ $\omega_p=~0.01$ m}{width=0.48\textwidth}{Fig5_3a.eps}
+\addsubpic{ $\omega_p=~0.03$ m}{width=0.48\textwidth}{Fig5_3b.eps}
+\addsubpic{ $\omega_p=~0.06$ m}{width=0.48\textwidth}{Fig5_3c.eps}
+\addsubpic{ $\omega_p=~0.09$ m。 其他参数：$\mathrm{C}^2_n=10^{-14}\mathrm{m}^{3-\alpha}$，$\alpha=~3.67$，$z=~3000$ m，$n=~-1$，$m=~1$，$\omega_i=~0.01$ m，以及 $\beta_i=\beta_p=~0$。}{width=0.48\textwidth}{Fig5_3d.eps}
+\end{pics}
+
+归一化检测概率分布与光子对的纠缠程度有关，并且它与泵浦光源束宽和光子模束宽的比值有密切关系\citeup{}。图 \ref{Fig5_3.eps} 展示了不同束宽比下二维 OAM 叠加态的归一化检测概率。在图 \ref{Fig5_3.eps}(a)-(d)中可以看到当 $\omega_p/\omega_i$ 增加时，检测概率在 $\omega_p=\omega_i=\pi/2$ 处几乎不变，但在 $\omega_p=\omega_i=0$ 处明显下降。这说明了 $\omega_p=\omega_i=\pi/2$ 时的 OAM 态能够更好的适应 $\omega_p/\omega_i$ 的改变。
+
+\pic[H]{信号光子的 $\hat{\~{P}}(\zeta_1)$ 随 $\beta_i$ 和 $\beta_p$ 的变化，这里有：$\mathrm{C}^2_n=10^{-14}\mathrm{m}^{3-\alpha}$，$\alpha=~3.67$，$z=~3000$ m，$n=~-1$，$m=~1$，$\omega_i=~0.01$ m，$\omega_p=~0.05$，$\theta_i=\theta_p=~\pi/2$ 。}{width=0.5\textwidth}{Fig5_4.eps}
+
+在大气湍流中，除了权重之外，泵浦光源及接收态的相对相位 $\beta_p$ 和 $\beta_i$ 也会对检测概率产生影响，如图 \ref{Fig5_4.eps} 所示。从图中能够观察到，当 $\beta_p=\beta_i$ 时，检测概率达到最大值；当 $\beta_p$ 与 $\beta_i$ 相差 $\pi$ 时，检测概率达到最小值。另外，我们能够看到，检测概率的分布具有周期性。以上结论告诉我们，在设计基于 纠缠 OAM 态的通信系统时，应保证 $\beta_p$ 和 $\beta_i$ 的值尽量接近。
+
+为了展现纠缠 OAM 态抵抗大气湍流的优势，在下面的内容中比较了纠缠与非纠缠的情形。在非纠缠的情形下，初始 OAM 态的检测概率可以通过计算以下的投影获得：
+  \begin{equation}
+ \begin{split}
+P(\zeta_1)\propto&\hat{P}(\zeta_1)=\int_0^{2\pi}\int_0^{2\pi}\int_0^{\infty}\int_0^{\infty}\xi_{p_0}^{(1)}(r_1,\varphi_1,z)\left[\xi_{p_0}^{(1)}(r_2,\varphi_2,z)\right]^\ast\\
+&\times\left[\zeta_{p}^{(1)}(r_1,\varphi_1,z)\right]^\ast\zeta_{p}^{(1)}(r_2,\varphi_2,z)\\
+&\times\left\langle\exp\left\{\mathrm{i}\left[\chi(r_1,\varphi_1,z)+\chi^\ast(r_2,\varphi_2,z)\right]\right\}\right\rangle r_{1}r_{2}dr_{1}dr_{2}d\varphi_{1}d\varphi_2
+ \label{Single_probability}
+ \end{split}
+\end{equation}
+\noindent 这里简单的假定 $p=p_0=0$。非纠缠 OAM 态归一化探测概率的计算类似于纠缠情形。
+
+\begin{pics}[H]{信号光子的 $\hat{\~{P}}(\zeta_1)$ 随传播距离 $z$ 的变化。}{Fig5_5.eps}
+\addsubpic{ $\alpha=~3.37$}{width=0.6\textwidth}{Fig5_5a.eps}
+\addsubpic{ $\alpha=~3.67$}{width=0.6\textwidth}{Fig5_5b.eps}
+\addsubpic{ $\alpha=~3.97$。其他参数：$\mathrm{C}^2_n=10^{-14}\mathrm{m}^{3-\alpha}$，$n=~-1$，$m=~1$，$\omega_i=~0.01$ m，$\omega_p=~0.05$，$\beta_i=\beta_p=~0$。}{width=0.6\textwidth}{Fig5_5c.eps}
+\end{pics}
+
+\begin{pics}[H]{信号光子的 $\hat{\~{P}}(\zeta_1)$ 随传播距离 $z$ 的变化。}{Fig5_6.eps}
+\addsubpic{ $\mathrm{C}^2_n=10^{-15}\mathrm{m}^{3-\alpha}$}{width=0.6
+\textwidth}{Fig5_6a.eps}
+\addsubpic{ $\mathrm{C}^2_n=5\times10^{-15}\mathrm{m}^{3-\alpha}$}{width=0.6
+\textwidth}{Fig5_6b.eps}
+\addsubpic{ $\mathrm{C}^2_n=7.5\times10^{-15}\mathrm{m}^{3-\alpha}$。其他参数：$n=~-1$，$m=~1$，$\alpha=~3.67$，$\omega_i=~0.01$ m，$\omega_p=~0.05$，$\beta_i=\beta_p=~0$。}{width=0.6
+\textwidth}{Fig5_6c.eps}
+\end{pics}
+
+图 \ref{Fig5_5.eps} 展示了在 non-Kolmogorov 湍流参数 $\alpha$ 不同时纠缠与非纠缠情形下的归一化检测概率随 $z$ 的变化。从图中我们可以看到，所有情形下检测概率随着 $z$ 的增加而减小。但是，我们可以看到纠缠与非纠缠情形下的明显区别。不论 $\alpha$ 是什么值，在 1 至 3 公里的范围内纠缠 OAM 态明显比非纠缠 OAM 态的检测概率要大。另外可以看到，当 $\theta_p=\theta_i=0$ 时，纠缠叠加态的检测概率要略小于  $\theta_p=\theta_i=\pi/2$ 的情形。图 \ref{Fig5_6.eps} 展示了湍流强度 $\mathrm{C}^2_n$ 不同时纠缠与非纠缠情形下的归一化检测概率随 $z$ 的变化。当 $\mathrm{C}^2_n$ 增加时，检测概率的下降速度加快。$\mathrm{C}^2_n$ 与 $\alpha$ 对检测概率的影响是类似的。
+
+\pic[H]{当 $\omega_i/\omega_p$ 不同时，信号光子的 $\hat{\~{P}}(\zeta_1)$ 随传播距离 $z$ 的变化，这里有 $\zeta_p=\zeta_i$。 另外对比了非纠缠的情形。其他参数：$\omega_i=~0.01$ m， $n=~-1$，$m=~1$，$\mathrm{C}^2_n=10^{-14}\mathrm{m}^{3-\alpha}$，$\alpha=~3.67$，$\beta_i=\beta_p=~0$。}{width=0.8\textwidth}{Fig5_7.eps}
+
+图 \ref{Fig5_7.eps} 展示了当束宽比 $\omega_p/\omega_i$ 不同时归一化检测概率随传播距离 $z$ 的变化。在 $\omega_p=2\omega_i$ 的情况下，$\zeta_p=0$ 时的检测概率与 $\zeta_p=\pi/2$ 时的基本相同。当 $\omega_p=4\omega_i$ 或者 $\omega_p=6\omega_i$ 时， $\zeta_p=\pi/2$ 的检测概率在 $z\geq 1$ km 时略大于$\zeta_p=0$ 的检测概率，并且随着 $z$ 的增加，这一差距就越大。比较纠缠与非纠缠的情形，可以看到纠缠下的检测概率明显比非纠缠的要大。
+
+图 \ref{Fig5_8.eps} 展示了在不同湍流环境下信号光子的初始态变成其他态的概率分布。首先，在图 \ref{Fig5_8.eps}(a)-(f) 中可以清楚地看到，概率分布并不对称，这一点不同于非纠缠下的概率分布\citeup{}。对比图 \ref{Fig5_8.eps}(a)、(c)、(e) 和图 \ref{Fig5_8.eps}(b)、(d)、(f) 可以看到，当 $\theta_p=\theta_i=\pi/2$ 时，初始态变成其他各个态的概率要略低于 $\theta_p=\theta_i=0$ 时的情况。另外，当 $\mathrm{C}^2_n$ 增加时，初始态的归一化检测概率下降。值得注意的是，在各个情况下 $\ket{0}$ 的检测概率都非常大，但初始态 $\ket{\zeta_1}$ 变成它的对径态$\ket{\zeta_2}$ 的概率却很小，这有利于将 $\ket{\zeta_1}$ 和 $\ket{\zeta_2}$ 同时用于通信中。
+
+\begin{pics}[H]{不同的大气湍流条件下，受到湍流影响的信号光子在各个 OAM 态上的概率分布。}{Fig5_8.eps}
+\addsubpic{ $\mathrm{C}^2_n=5\times 10^{-15}\mathrm{m}^{3-\alpha}$，$\theta_i=\theta_p=0$}{width=0.37\textwidth}{Fig5_8a.eps}
+\addsubpic{ $\mathrm{C}^2_n=5\times 10^{-15}\mathrm{m}^{3-\alpha}$，$\theta_i=\theta_p=\pi/2$}{width=0.37\textwidth}{Fig5_8b.eps}
+\addsubpic{ $\mathrm{C}^2_n=7.5\times 10^{-15}\mathrm{m}^{3-\alpha}$，$\theta_i=\theta_p=0$}{width=0.37\textwidth}{Fig5_8c.eps}
+\addsubpic{ $\mathrm{C}^2_n=7.5\times 10^{-15}\mathrm{m}^{3-\alpha}$，$\theta_i=\theta_p=\pi/2$}{width=0.37\textwidth}{Fig5_8d.eps}
+\addsubpic{ $\mathrm{C}^2_n=1.0\times 10^{-14}\mathrm{m}^{3-\alpha}$，$\theta_i=\theta_p=0$}{width=0.37\textwidth}{Fig5_8e.eps}
+\addsubpic{ $\mathrm{C}^2_n=1.0\times 10^{-14}\mathrm{m}^{3-\alpha}$，$\theta_i=\theta_p=\pi/2$。其他参数：$\omega_i=~0.01$ m，$\omega_p=~0.05$ m， $n=~-1$，$m=~1$，$z=~3000$ m，$\alpha=~3.67$，$\beta_i=\beta_p=~0$。}{width=0.37\textwidth}{Fig5_8f.eps}
+\end{pics}
+
+\section{本章小结}
+这一章研究了由 SPDC 产生的纠缠光子对在 non-Kolmogorov 湍流中的 OAM 扩散。这里泵浦光源是由叠加 LG 模组成的。为了方便，二维的情形被重点的讨论到。二维的情形包括：（1）泵浦光源由 2 个 LG 模组成；（2）在 2 维的希尔伯特空间测量 OAM 态的概率。对于二维情形有一个重要结论。当两个 OAM 量子数互为相反数，如果检测投影的权重和相对相位与组成泵浦光源的 2 个 LG 模的权重和相对相位完全一致时，检测概率最大。在此情形下，相对相位的变化不会影响到检测概率的值。
+
+另外，本章比较了在 non-Kolmogorov 湍流中纠缠情形与不纠缠情形的检测概率。数值计算表明，二维情形比一维和不纠缠情形的检测概率要大。这一结论有助于基于 OAM 的大气通信系统的设计与改进。
+
+% !Mode:: "TeX:UTF-8"
+
+\chapter{总结与展望}
+\section{研究总结}
+本文主要研究了汇聚涡旋光束、二维叠加轨道角动量态以及利用特殊泵浦光源制备的纠缠光子对在大气湍流中的检测概率以及轨道角动量扩散。研究结论通过理论模型建立和数值计算获得。另外，为了计算方便而不失准确性，在第三、四、五章里所采用的大气湍流模型均为 non-Kolmogorov 湍流模型。
+
+第三章的结论表明了调整 CiB 的参数可使得 CiB 具有汇聚特性并进而呈现出自动恢复效应。自动恢复效应的出现意味着 CiB 的轨道角动量分布能够在光腰附近的位置聚拢，同时初始轨道角动量态的检测概率随着传播距离的增加而回升。这一现象在较强的扰动区域表现得更为明显。自动恢复效应在基于轨道角动量的大气通信中具有提高通信质量的潜力。
+
+第四章的结论表明了当二维叠加轨道角动量态的两个轨道角动量量子数彼此相邻时，在大气湍流中能够表现出协同效应。在大气湍流的影响下，协同效应使得二维叠加轨道角动量态的检测概率能够高于轨道角动量本征态。当叠加轨道角动量态的两个轨道角动量量子数不相邻时，协同效应不明显。
+
+第五章的结论表明了当泵浦光源由轨道角动量模叠加而成时，并且当制备的纠缠光子对在波函数与泵浦光源的复振幅函数一致时，信号光子的初始轨道角动量态能够获得最大检测概率。另外在纠缠情形下，被大气湍流影响的低阶轨道角动量叠加态的检测概率可以比低阶轨道角动量本征态的检测概率更大。这一结论为基于轨道角动量的通信系统的设计提供了新思路。
+
+\section{研究展望}
+本文的第三、四、五章揭示了几种不同的轨道角动量态在大气湍流中所呈现出的特殊物理特性，这些特性有助于增强轨道角动量态抵抗湍流效应的能力。另外，这些特性也许有助于改善基于轨道角动量通信的通信质量。为了让这些物理特性在具体的通信过程中发挥作用，本文的研究还需要加以拓展。
+
+1、本文第三章仅仅讨论了 CiB 的汇聚特性及其在大气湍流中表现出的自动恢复效应。事实上，无论什么类型的轨道角动量模，只要在一定程度上汇聚就可以拥有自动恢复效应，并且汇聚程度越高，自动恢复效应越明显。因此，下一步工作应主要讨论具有强汇聚程度的涡旋光束，比如最近发现的 AHB \citeup{Kovalev2016_Auto}。
+
+2、本文第四章仅仅讨论了二维叠加轨道角动量态的协同效应。为了探究这一效应在大气通信中的作用，下一步工作应讨论高维轨道角动量叠加态中的协同效应，并对大气通信系统做出相应的改进。
+
+3、本文第五章讨论了当泵浦光源由叠加轨道角动量模组成时，纠缠光子对的信号光子在大气湍流中的探测概率。但是，这里所讨论的情形只有二维情形。下一步工作可讨论高维情形，并研究其在通信中的应用。
+
+4、本文的所有理论推导和数值仿真都是基于 non-Kolmogorov 湍流模型得出的。事实上，这里可用的大气湍流光学模型有三种：Kolmogorov 湍流模型、non-Kolmogorov 湍流模型和各向异性湍流模型。由于各向异性湍流模型是这三种模型中普适性最好的模型，所以在下一步的工作中，可考虑利用各向异性湍流模型来讨论大气湍流对涡旋光束的影响。
+
+5、本文仅讨论了标量涡旋光束，矢量涡旋光束在大气湍流中的特性仍具有广阔的研究空间。
+
 
 \thesisacknowledgement
-在攻读博士学位期间，首先衷心感谢我的导师XXX教授
+首先感谢我的导师刘义东老师。从本文的选题到最终的顺利完成都离不开刘老师的指导。在我所发表的几篇论文的写作过程中，刘老师与我进行了多次有益的讨论，并给予我大量宝贵的建议。在研究思路和文献的阅读方法上，刘老师的指导使我受益颇多。在生活中刘老师能够充分理解并关心学生，为我学业的顺利完成提供了保障。
+
+感谢王建东老师和刘普生老师在这三年里对我的学习研究提供了许多指导，并给了我很多支持和鼓励。感谢付永启老师、陈树强老师、荣建老师、杨华军老师、杨小丽老师，他们的授课让我学到了专业知识和研究方法，他们对待学术的态度使我受益匪浅。
+
+感谢同学宋丽、张基彪、张洪、高书伟、白军、周伟、赖仓隆、梁宪红、陈清清、张云燕、黄颖、谢维都、夏强强、王明寿同我度过一段难忘的研究生时光，同时他们在学习和生活中给予我许多帮助和鼓励。
+
+感谢我的家人，没有他们的支持和理解，我的学业就不可能顺利完成。
 
 
 \thesisloadbibliography[nocite]{reference}
@@ -248,12 +914,4 @@ f(\mathbf{x}^{i};\mathbf{w})\cdot f(\mathbf{x}^{j};\mathbf{w}),\text{otherwise},
 
 \thesisloadachievement{publications}
 
-
-\thesistranslationoriginal
-\section{A Tight Upper Bound on Bit Error Rate}
-
-
-\thesistranslationchinese
-
-\section{基于多载波索引键控的正交频分多路复用系统模型}
 \end{document}
